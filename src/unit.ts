@@ -2,20 +2,19 @@
 
 var fs = require('fs');
 
-class ToolRef {
+export class ToolRef {
     Toolchain:string;
     Subcmd:string;
 }
 
-class Info {
+export class Info {
     Path:string;
     Dir:string;
     ConfigFile:string;
     Program:string;
 }
 
-class SourceUnit {
-
+export class SourceUnit {
     Name:string;
     Type:string;
     Repo:string;

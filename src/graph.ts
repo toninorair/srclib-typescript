@@ -1,13 +1,14 @@
 /// <reference path="../typings/node/node.d.ts" />
-/// <reference path="ast-traverse.ts" />
 
 var fs = require('fs');
+import traverse = require('./ast-traverse');
+import unit = require('./unit');
 
-class GraphAction implements Action {
+export class GraphAction implements Action {
 
     private unitFile:string;
 
-    private tree: ASTTraverse = new ASTTraverse();
+    private tree: traverse.ASTTraverse = new traverse.ASTTraverse();
 
     constructor(unitFile?:string) {
         this.unitFile = unitFile;
@@ -19,7 +20,7 @@ class GraphAction implements Action {
             fd = fs.createReadStream(this.unitFile);
           }
          var self = this;
-        SourceUnit.readSourceUnit(function (err:Error, data:SourceUnit) {
+        unit.SourceUnit.readSourceUnit(function (err:Error, data:unit.SourceUnit) {
             if (err) {
                 console.error(err);
                 process.exit(1);
@@ -38,6 +39,7 @@ class GraphAction implements Action {
     private _graph(file:string):void {
         var self = this;
         console.log("Building graph for %s", file);
+        console.log("I am here inside _graph");
         self.tree.addFile(file);
         // TODO
     }

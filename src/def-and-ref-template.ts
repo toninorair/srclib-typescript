@@ -1,11 +1,11 @@
-class Data {
+export class Data {
     Type: string;
     Keyword: string;
     Kind: string;
     Separator: string;
 }
 
-class Def {
+export class Def {
     Path: string;
     Name: string;
     Kind: string;
@@ -16,14 +16,14 @@ class Def {
     TreePath: string;
 }
 
-class Ref {
+export class Ref {
     DefPath: string;
     File: string;
     Start: number;
     End: number;
 }
 
-class RootObject {
+export class RootObject {
     Defs: Array<Def>;
     Refs: Array<Ref>;
 }
