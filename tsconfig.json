@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "out": ".bin/srclib-typescript.js"
+  },
+  "files": [
+    "src/unit.ts",
+    "src/dependency.ts",
+    "src/action.ts",
+    "src/srclib-typescript.ts",
+    "src/scan.ts",
+    "src/graph.ts",
+    "src/depresolve.ts"
+  ]
+}

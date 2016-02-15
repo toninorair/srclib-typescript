@@ -1,7 +1,5 @@
 /// <reference path="../typings/node/node.d.ts" />
 
-//import * as fs from "fs";
-
 var fs = require('fs');
 
 class GraphAction implements Action {
@@ -14,16 +12,9 @@ class GraphAction implements Action {
 
     execute():void {
         var fd = process.stdin;
-        //var fd = fs.openSync("/Users/tonya/test.ts", 'r');
-        //var fd = fs.readFileSync('/Users/tonya/test.ts', "utf8");
-      //  var fd;
         if (this.unitFile) {
             fd = fs.createReadStream(this.unitFile);
           }
-        // } else {
-        //   fd = fs.openSync("/Users/tonya/test.ts", 'r');
-        // }
-
          var self = this;
         SourceUnit.readSourceUnit(function (err:Error, data:SourceUnit) {
             if (err) {

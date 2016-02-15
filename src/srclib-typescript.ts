@@ -10,15 +10,16 @@ program.command("scan").action(function() {new ScanAction().execute()});
 program.
     command("graph").
     option("--debug-unit-file <debug-unit-file>").
-    action(function() {
-        new GraphAction(program.debugUnitFile).execute()
+    action(function(command) {
+        new GraphAction(command.debugUnitFile).execute()
     });
 program.command("depresolve").
     option("--debug-unit-file <debug-unit-file>").
-    action(function() {new DepresolveAction().execute()});
+    action(function(command) {
+      new DepresolveAction(command.debugUnitFile).execute()
+    });
 program.command("*").action(function(command) {
     console.error("Invalid command %s", command);
     process.exit(1);
 });
 program.parse(process.argv);
-
