@@ -1,6 +1,7 @@
 /// <reference path="../typings/node/node.d.ts" />
 
 var D_TS_SUFFIX:string = 'd.ts';
+var TESTS_DIR:string = '/Users/tonya/typescript-tests/';
 
 var fs = require('fs');
 var path = require('path');
@@ -10,7 +11,7 @@ class ScanAction implements Action {
 
     execute():void {
 
-        var tsConfig = tsconfig.loadSync('.');
+        var tsConfig = tsconfig.loadSync(TESTS_DIR);
         var files:string[] = this._collectFiles(tsConfig.files);
 
         var sourceUnit = new SourceUnit();

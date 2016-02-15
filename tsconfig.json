@@ -11,6 +11,8 @@
     "src/srclib-typescript.ts",
     "src/scan.ts",
     "src/graph.ts",
-    "src/depresolve.ts"
+    "src/depresolve.ts",
+    "src/ast-traverse.ts",
+    "src/def-and-ref-template.ts"
   ]
 }

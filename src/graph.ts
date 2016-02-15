@@ -1,10 +1,13 @@
 /// <reference path="../typings/node/node.d.ts" />
+/// <reference path="ast-traverse.ts" />
 
 var fs = require('fs');
 
 class GraphAction implements Action {
 
     private unitFile:string;
+
+    private tree: ASTTraverse = new ASTTraverse();
 
     constructor(unitFile?:string) {
         this.unitFile = unitFile;
@@ -33,8 +36,9 @@ class GraphAction implements Action {
     }
 
     private _graph(file:string):void {
+        var self = this;
         console.log("Building graph for %s", file);
-
+        self.tree.addFile(file);
         // TODO
     }
 }
