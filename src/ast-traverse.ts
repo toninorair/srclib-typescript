@@ -4,77 +4,99 @@ import {readFileSync} from "fs";
 import * as ts from "typescript";
 import defs = require('./def-and-ref-template');
 
- export class ASTTraverse {
-
-    private sourceFile: ts.SourceFile;
+export class ASTTraverse {
 
     private allObjects: defs.RootObject;
+    private program: ts.Program;
+    private checker: ts.TypeChecker;
 
-    emitNamedDef(ident: ts.Identifier, kind: string) {
+    constructor(fileNames: string[]) {
+        console.log(fileNames);
+        this.program = ts.createProgram(fileNames, {
+            target: ts.ScriptTarget.ES5, module: ts.ModuleKind.CommonJS
+        });
+
+        // Get the checker, we will use it to find more about classes
+        this.checker = this.program.getTypeChecker();
+
+        //initialize def/ref storage
+        this.allObjects = new defs.RootObject();
+    }
+
+    traverse() {
+        for (const sourceFile of this.program.getSourceFiles()) {
+            if (!sourceFile.hasNoDefaultLib) {
+                // Walk the tree to search for classes
+                console.log(sourceFile.fileName);
+                ts.forEachChild(sourceFile, _visit);
+            }
+            var self = this;
+
+            function _visit(node: ts.Node) {
+                //console.log(this);
+                if (node.kind === ts.SyntaxKind.ClassDeclaration) {
+                    var classDecl: ts.ClassDeclaration = <ts.ClassDeclaration>node;
+                    let symbol = self.checker.getSymbolAtLocation(classDecl.name);
+
+                    // console.log("Inside class = ", self.checker.getFullyQualifiedName(symbol));
+
+                    //emit def here
+                    self._emitNamedDef(node, symbol, "class");
+                }
+
+                if (node.kind === ts.SyntaxKind.PropertyAccessExpression) {
+                    var decl: ts.PropertyAccessExpression = <ts.PropertyAccessExpression>node;
+                    let symbol = self.checker.getSymbolAtLocation(decl.name);
+
+                    //emit ref here
+                    self._emitRef(node, symbol);
+                    // let type = checker.typeToString(checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration));
+                }
+
+                ts.forEachChild(node, _visit);
+            }
+        };
+        console.log(JSON.stringify(this.allObjects));
+    }
+
+    private _emitNamedDef(node: ts.Node, symbol: ts.Symbol, kind: string) {
+        //emitting def here
         var def: defs.Def = new defs.Def();
-        def.Name = ident.text;
-        //add path resolution here
+        def.Name = symbol.name;
+        def.Path = this.checker.getFullyQualifiedName(symbol);
         def.Kind = kind;
-        def.File = this.sourceFile.fileName;
-        def.DefStart = ident.getStart();
-        def.DefEnd = ident.getEnd();
+        def.File = node.getSourceFile().fileName;
+        def.DefStart = node.getStart();
+        def.DefEnd = node.getEnd();
         this.allObjects.Defs.push(def);
+        //console.log(JSON.stringify(def));
     }
 
-    private emitDefs(node: ts.Node, depth = 0) {
-        console.log(new Array(depth+1).join('----'), node.kind, node.pos, node.end);
-        //for debug purposes for now
-        depth++;
-
-        if (node.kind == ts.SyntaxKind.VariableDeclaration) {
-            var varDecl: ts.VariableDeclaration = <ts.VariableDeclaration>node;
-            if (varDecl.name.kind == ts.SyntaxKind.Identifier) {
-                var ident: ts.Identifier = <ts.Identifier>varDecl.name;
-                this.emitNamedDef(ident, "var");
-            }
-        }
-        else if (node.kind == ts.SyntaxKind.FunctionDeclaration) {
-            var funcDecl: ts.FunctionDeclaration = <ts.FunctionDeclaration>node;
-            if (funcDecl.name.kind == ts.SyntaxKind.Identifier) {
-                var ident: ts.Identifier = <ts.Identifier>funcDecl.name;
-                this.emitNamedDef(ident, "func");
-            }
-        }
-        else if (node.kind == ts.SyntaxKind.ClassDeclaration) {
-            var classDecl: ts.ClassDeclaration = <ts.ClassDeclaration>node;
-            if (classDecl.name.kind == ts.SyntaxKind.Identifier) {
-                var ident: ts.Identifier = <ts.Identifier>classDecl.name;
-                this.emitNamedDef(ident, "class");
-            }
-        }
-        else if (node.kind == ts.SyntaxKind.InterfaceDeclaration) {
-            var interfaceDecl: ts.InterfaceDeclaration = <ts.InterfaceDeclaration>node;
-            if (interfaceDecl.name.kind == ts.SyntaxKind.Identifier) {
-                var ident: ts.Identifier = <ts.Identifier>interfaceDecl.name;
-                this.emitNamedDef(ident, "interface");
-            }
-
-        }
-        else if (node.kind == ts.SyntaxKind.EnumDeclaration) {
-            var enumDecl: ts.EnumDeclaration = <ts.EnumDeclaration>node;
-            if (enumDecl.name.kind == ts.SyntaxKind.Identifier) {
-                var ident: ts.Identifier = <ts.Identifier>enumDecl.name;
-                this.emitNamedDef(ident, "enum");
-            }
-        }
-
-        else if (node.kind == ts.SyntaxKind.Identifier) {
-            //console.log("Inside identifier with id = ", node.id);
-            //emit refs here
-        }
-        // }
-        node.getChildren().forEach(c => this.emitDefs(c, depth));
-        // var checker = program.getTypeChecker(true);
-    }
-
-    addFile(fileName: string) {
-        console.log("I am here inside adding files");
-        this.sourceFile = ts.createSourceFile(fileName, readFileSync(fileName).toString(), ts.ScriptTarget.ES6, /*setParentNodes */ true);
-        this.emitDefs(this.sourceFile);
+    private _emitRef(node: ts.Node, symbol: ts.Symbol) {
+        //emitting ref here
+        var ref: defs.Ref = new defs.Ref();
+        ref.DefPath = this.checker.getFullyQualifiedName(symbol);
+        ref.File = node.getSourceFile().fileName;
+        ref.Start = node.getStart();
+        ref.End = node.getEnd();
+        this.allObjects.Refs.push(ref);
+        // console.log(JSON.stringify(ref));
     }
 }
+
+// private _getParentChain(node: ts.Node, parentChain: string = "") {
+//
+//     if (!node) {
+//         return parentChain;
+//     }
+//     switch (node.kind) {
+//         case ts.SyntaxKind.ModuleDeclaration:
+//             var moduleDecl: ts.ModuleDeclaration = <ts.ModuleDeclaration>node;
+//         case ts.SyntaxKind.ClassDeclaration:
+//             var classDecl: ts.ClassDeclaration = <ts.ClassDeclaration>node;
+//         case ts.SyntaxKind.FunctionDeclaration:
+//             var funcDecl: ts.FunctionDeclaration = <ts.FunctionDeclaration>node;
+//
+//     }
+// }
+//
