@@ -3,6 +3,7 @@
 import * as fs from "fs";
 import * as ts from "typescript";
 import defs = require('./def-and-ref-template');
+import utils = require('./utils');
 
 export class ASTTraverse {
 
@@ -10,6 +11,7 @@ export class ASTTraverse {
     private program: ts.Program;
     private checker: ts.TypeChecker;
     private allDeclIds: Array<ts.Identifier>;
+
 
     constructor(fileNames: string[]) {
         this.program = ts.createProgram(fileNames, {
@@ -67,55 +69,60 @@ export class ASTTraverse {
 
         function _collectDefs(node: ts.Node) {
             switch (node.kind) {
-                case ts.SyntaxKind.ClassDeclaration:
-                    let classDecl = <ts.ClassDeclaration>node;
-                    let classSym = self.checker.getSymbolAtLocation(classDecl.name);
-                    self.allDeclIds.push(classDecl.name);
+                case ts.SyntaxKind.ClassDeclaration: {
+                    let decl = <ts.ClassDeclaration>node;
+                    let symbol = self.checker.getSymbolAtLocation(decl.name);
+                    self.allDeclIds.push(decl.name);
 
                     //emit def here
-                    self._emitDef(node, classSym, "class");
+                    self._emitDef(node, symbol, utils.DefKind.CLASS);
                     break;
-
-                case ts.SyntaxKind.FunctionDeclaration:
-                    let funDecl = <ts.FunctionDeclaration>node;
-                    let funSym = self.checker.getSymbolAtLocation(funDecl.name);
-                    self.allDeclIds.push(funDecl.name);
-
-                    //emit def here
-                    self._emitDef(node, funSym, "function");
-                    break;
-                case ts.SyntaxKind.MethodDeclaration:
-                    let methodDecl = <ts.MethodDeclaration>node;
-                    let methodSym = self.checker.getSymbolAtLocation(methodDecl.name);
-                    self.allDeclIds.push(<ts.Identifier>methodDecl.name);
+                }
+                case ts.SyntaxKind.FunctionDeclaration: {
+                    let decl = <ts.FunctionDeclaration>node;
+                    let symbol = self.checker.getSymbolAtLocation(decl.name);
+                    self.allDeclIds.push(decl.name);
 
                     //emit def here
-                    self._emitDef(node, methodSym, "method");
+                    self._emitDef(node, symbol, utils.DefKind.FUNC);
                     break;
-                case ts.SyntaxKind.VariableDeclaration:
-                    let varDecl = <ts.VariableDeclaration>node;
-                    let varSym = self.checker.getSymbolAtLocation(varDecl.name);
-                    self.allDeclIds.push(<ts.Identifier>varDecl.name);
+                }
+                case ts.SyntaxKind.MethodDeclaration: {
+                    let decl = <ts.MethodDeclaration>node;
+                    let symbol = self.checker.getSymbolAtLocation(decl.name);
+                    self.allDeclIds.push(<ts.Identifier>decl.name);
 
                     //emit def here
-                    self._emitDef(node, varSym, "var");
+                    self._emitDef(node, symbol, utils.DefKind.METHOD);
                     break;
-                case ts.SyntaxKind.Parameter:
-                    let paramDecl = <ts.ParameterDeclaration>node;
-                    let paramSym = self.checker.getSymbolAtLocation(paramDecl.name);
-                    self.allDeclIds.push(<ts.Identifier>paramDecl.name);
+                }
+                case ts.SyntaxKind.VariableDeclaration: {
+                    let decl = <ts.VariableDeclaration>node;
+                    let symbol = self.checker.getSymbolAtLocation(decl.name);
+                    self.allDeclIds.push(<ts.Identifier>decl.name);
 
                     //emit def here
-                    self._emitDef(node, paramSym, "param");
+                    self._emitDef(node, symbol, utils.DefKind.VAR);
                     break;
-                case ts.SyntaxKind.PropertyDeclaration:
-                    let fieldDecl = <ts.PropertyDeclaration>node;
-                    let fieldSym: ts.Symbol = self.checker.getSymbolAtLocation(fieldDecl.name);
-                    self.allDeclIds.push(<ts.Identifier>fieldDecl.name);
+                }
+                case ts.SyntaxKind.Parameter: {
+                    let decl = <ts.ParameterDeclaration>node;
+                    let symbol = self.checker.getSymbolAtLocation(decl.name);
+                    self.allDeclIds.push(<ts.Identifier>decl.name);
 
                     //emit def here
-                    self._emitDef(node, fieldSym, "property");
+                    self._emitDef(node, symbol, utils.DefKind.PARAM);
                     break;
+                }
+                case ts.SyntaxKind.PropertyDeclaration: {
+                    let decl = <ts.PropertyDeclaration>node;
+                    let symbol: ts.Symbol = self.checker.getSymbolAtLocation(decl.name);
+                    self.allDeclIds.push(<ts.Identifier>decl.name);
+
+                    //emit def here
+                    self._emitDef(node, symbol, utils.DefKind.FIELD);
+                    break;
+                }
             }
             ts.forEachChild(node, _collectDefs);
         }
@@ -138,7 +145,7 @@ export class ASTTraverse {
         def.Name = symbol.name;
         //def.Path = this.checker.getFullyQualifiedName(symbol);
         var scopeRes: string = this._getNamedScope(node.parent);
-        def.Path = (scopeRes === "") ? symbol.name : scopeRes + "." + symbol.name;
+        def.Path = (scopeRes === "") ? symbol.name : scopeRes + utils.PATH_SEPARATOR + symbol.name;
         def.Kind = kind;
         def.File = node.getSourceFile().fileName;
         def.DefStart = node.getStart();
@@ -152,7 +159,7 @@ export class ASTTraverse {
         //emitting ref here
         var ref: defs.Ref = new defs.Ref();
         if (defineScope) {
-            ref.DefPath = this._getNamedScope(node) + "." + symbol.name;
+            ref.DefPath = this._getNamedScope(node) + utils.PATH_SEPARATOR + symbol.name;
         } else {
             ref.DefPath = this.checker.getFullyQualifiedName(symbol);
         }
@@ -172,27 +179,27 @@ export class ASTTraverse {
 
         switch (node.kind) {
             case ts.SyntaxKind.ModuleDeclaration: {
-                let moduleDecl = <ts.ModuleDeclaration>node;
-                let name = moduleDecl.name.text;
-                let newChain = (parentChain === "") ? name : name + "." + parentChain;
+                let decl = <ts.ModuleDeclaration>node;
+                let name = decl.name.text;
+                let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
                 return this._getNamedScope(node.parent, newChain);
             }
             case ts.SyntaxKind.ClassDeclaration: {
-                let classDecl = <ts.ClassDeclaration>node;
-                let name = classDecl.name.getText();
-                let newChain = (parentChain === "") ? name : name + "." + parentChain;
+                let decl = <ts.ClassDeclaration>node;
+                let name = decl.name.getText();
+                let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
                 return this._getNamedScope(node.parent, newChain);
             }
             case ts.SyntaxKind.FunctionDeclaration: {
-                let funcDecl = <ts.FunctionDeclaration>node;
-                let name = funcDecl.name.getText();
-                let newChain = (parentChain === "") ? name : name + "." + parentChain;
+                let decl = <ts.FunctionDeclaration>node;
+                let name = decl.name.getText();
+                let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
                 return this._getNamedScope(node.parent, newChain);
             }
             case ts.SyntaxKind.MethodDeclaration: {
-                let methodDecl = <ts.MethodDeclaration>node;
-                let name = methodDecl.name.getText();
-                let newChain = (parentChain === "") ? name : name + "." + parentChain;
+                let decl = <ts.MethodDeclaration>node;
+                let name = decl.name.getText();
+                let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
                 return this._getNamedScope(node.parent, newChain);
             }
             default:

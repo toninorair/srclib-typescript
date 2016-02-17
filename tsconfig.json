@@ -13,6 +13,7 @@
     "src/graph.ts",
     "src/depresolve.ts",
     "src/ast-traverse.ts",
-    "src/def-and-ref-template.ts"
+    "src/def-and-ref-template.ts",
+    "src/utils.ts"
   ]
 }
