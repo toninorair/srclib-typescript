@@ -84,6 +84,18 @@ export class ASTTraverse {
                     //emit def here
                     self._emitNamedDef(node, varSym, "var");
                     break;
+                case ts.SyntaxKind.Parameter:
+                    let paramSym = self.checker.getSymbolAtLocation((<ts.ParameterDeclaration>node).name);
+
+                    //emit def here
+                    self._emitNamedDef(node, paramSym, "param");
+                    break;
+                case ts.SyntaxKind.PropertyDeclaration:
+                    let fieldSym = self.checker.getSymbolAtLocation((<ts.PropertyDeclaration>node).name);
+
+                    //emit def here
+                    self._emitNamedDef(node, fieldSym, "property");
+                    break;
             }
             ts.forEachChild(node, _collectDefs);
         }
