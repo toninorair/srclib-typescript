@@ -159,7 +159,8 @@ export class ASTTraverse {
         //emitting ref here
         var ref: defs.Ref = new defs.Ref();
         if (defineScope) {
-            ref.DefPath = this._getNamedScope(node) + utils.PATH_SEPARATOR + symbol.name;
+            var scopeRes: string = this._getNamedScope(node.parent);
+            ref.DefPath = (scopeRes === "") ? symbol.name : scopeRes + utils.PATH_SEPARATOR + symbol.name;
         } else {
             ref.DefPath = this.checker.getFullyQualifiedName(symbol);
         }
