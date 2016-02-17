@@ -53,10 +53,12 @@ export class ASTTraverse {
                 self._emitRef(node, symbol);
             } else if (node.kind === ts.SyntaxKind.Identifier) {
                 let id = <ts.Identifier>node;
-                let symbol = self.checker.getSymbolAtLocation(<ts.Identifier>node);
+                let symbol = self.checker.getSymbolAtLocation(id);
                 if (!self._isDeclarationIdentifier(id)) {
                     //emit ref here
-                    self._emitRef(node, symbol);
+                    //self._emitRef(node, symbol);
+                    //assuming that node is defined in the current scope
+                    self._emitRef(node, symbol, true);
                 }
             } else {
                 ts.forEachChild(node, _collectRefs);
@@ -135,7 +137,8 @@ export class ASTTraverse {
         var def: defs.Def = new defs.Def();
         def.Name = symbol.name;
         //def.Path = this.checker.getFullyQualifiedName(symbol);
-        def.Path = this._getNamedScope(node.parent);
+        var scopeRes: string = this._getNamedScope(node.parent);
+        def.Path = (scopeRes === "") ? symbol.name : scopeRes + "." + symbol.name;
         def.Kind = kind;
         def.File = node.getSourceFile().fileName;
         def.DefStart = node.getStart();
@@ -145,10 +148,15 @@ export class ASTTraverse {
         // console.log("-------------------");
     }
 
-    private _emitRef(node: ts.Node, symbol: ts.Symbol) {
+    private _emitRef(node: ts.Node, symbol: ts.Symbol, defineScope: boolean = false) {
         //emitting ref here
         var ref: defs.Ref = new defs.Ref();
-        ref.DefPath = this.checker.getFullyQualifiedName(symbol);
+        if (defineScope) {
+            ref.DefPath = this._getNamedScope(node) + "." + symbol.name;
+        } else {
+            ref.DefPath = this.checker.getFullyQualifiedName(symbol);
+        }
+
         ref.File = node.getSourceFile().fileName;
         ref.Start = node.getStart();
         ref.End = node.getEnd();
@@ -166,22 +174,26 @@ export class ASTTraverse {
             case ts.SyntaxKind.ModuleDeclaration: {
                 let moduleDecl = <ts.ModuleDeclaration>node;
                 let name = moduleDecl.name.text;
-                return this._getNamedScope(node.parent, name + "." + parentChain);
+                let newChain = (parentChain === "") ? name : name + "." + parentChain;
+                return this._getNamedScope(node.parent, newChain);
             }
             case ts.SyntaxKind.ClassDeclaration: {
                 let classDecl = <ts.ClassDeclaration>node;
                 let name = classDecl.name.getText();
-                return this._getNamedScope(node.parent, name + "." + parentChain);
+                let newChain = (parentChain === "") ? name : name + "." + parentChain;
+                return this._getNamedScope(node.parent, newChain);
             }
             case ts.SyntaxKind.FunctionDeclaration: {
                 let funcDecl = <ts.FunctionDeclaration>node;
                 let name = funcDecl.name.getText();
-                return this._getNamedScope(node.parent, name + "." + parentChain);
+                let newChain = (parentChain === "") ? name : name + "." + parentChain;
+                return this._getNamedScope(node.parent, newChain);
             }
             case ts.SyntaxKind.MethodDeclaration: {
                 let methodDecl = <ts.MethodDeclaration>node;
                 let name = methodDecl.name.getText();
-                return this._getNamedScope(node.parent, name + "." + parentChain);
+                let newChain = (parentChain === "") ? name : name + "." + parentChain;
+                return this._getNamedScope(node.parent, newChain);
             }
             default:
                 return this._getNamedScope(node.parent, parentChain);
