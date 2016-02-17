@@ -33,27 +33,42 @@ export class ASTTraverse {
             var self = this;
 
             function _visit(node: ts.Node) {
-                //console.log(this);
-                if (node.kind === ts.SyntaxKind.ClassDeclaration) {
-                    var classDecl: ts.ClassDeclaration = <ts.ClassDeclaration>node;
-                    let symbol = self.checker.getSymbolAtLocation(classDecl.name);
 
-                    // console.log("Inside class = ", self.checker.getFullyQualifiedName(symbol));
+                //             var classDecl: ts.ClassDeclaration = <ts.ClassDeclaration>node;
+                //         case ts.SyntaxKind.FunctionDeclaration:
+                //             var funcDecl: ts.FunctionDeclaration = <ts.FunctionDeclaration>node;
+                if (node.kind === ts.SyntaxKind.ClassDeclaration) {
+                    let symbol = self.checker.getSymbolAtLocation((<ts.ClassDeclaration>node).name);
 
                     //emit def here
                     self._emitNamedDef(node, symbol, "class");
-                }
+                    ts.forEachChild(node, _visit);
+                } else if (node.kind === ts.SyntaxKind.FunctionDeclaration) {
+                    let symbol = self.checker.getSymbolAtLocation((<ts.FunctionDeclaration>node).name);
 
-                if (node.kind === ts.SyntaxKind.PropertyAccessExpression) {
-                    var decl: ts.PropertyAccessExpression = <ts.PropertyAccessExpression>node;
-                    let symbol = self.checker.getSymbolAtLocation(decl.name);
+                    //emit def here
+                    self._emitNamedDef(node, symbol, "function");
+                    ts.forEachChild(node, _visit);
+                } else if (node.kind === ts.SyntaxKind.MethodDeclaration) {
+                    let symbol = self.checker.getSymbolAtLocation((<ts.MethodDeclaration>node).name);
+
+                    //emit def here
+                    self._emitNamedDef(node, symbol, "method");
+                    //ts.forEachChild(node, _visit);
+                } else if (node.kind === ts.SyntaxKind.PropertyAccessExpression) {
+                    let symbol = self.checker.getSymbolAtLocation((<ts.PropertyAccessExpression>node).name);
 
                     //emit ref here
                     self._emitRef(node, symbol);
                     // let type = checker.typeToString(checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration));
-                }
+                } else if (node.kind === ts.SyntaxKind.Identifier) {
+                    let symbol = self.checker.getSymbolAtLocation(<ts.Identifier>node);
 
-                ts.forEachChild(node, _visit);
+                    //emit ref here
+                    self._emitRef(node, symbol);
+                } else {
+                    ts.forEachChild(node, _visit);
+                }
             }
         };
         console.log(JSON.stringify(this.allObjects));
