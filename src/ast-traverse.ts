@@ -9,6 +9,7 @@ export class ASTTraverse {
     private allObjects: defs.RootObject;
     private program: ts.Program;
     private checker: ts.TypeChecker;
+    private allDeclIds: Array<ts.Identifier>;
 
     constructor(fileNames: string[]) {
         this.program = ts.createProgram(fileNames, {
@@ -19,6 +20,8 @@ export class ASTTraverse {
 
         //initialize def/ref storage
         this.allObjects = new defs.RootObject();
+
+        this.allDeclIds = new Array<ts.Identifier>();
     }
 
     traverse() {
@@ -40,7 +43,7 @@ export class ASTTraverse {
             }
         };
         fs.writeFileSync("defs-refs.json", JSON.stringify(this.allObjects));
-        console.log(JSON.stringify(this.allObjects));
+        //console.log(JSON.stringify(this.allObjects));
 
         function _collectRefs(node: ts.Node) {
             if (node.kind === ts.SyntaxKind.PropertyAccessExpression) {
@@ -49,59 +52,85 @@ export class ASTTraverse {
                 //emit ref here
                 self._emitRef(node, symbol);
             } else if (node.kind === ts.SyntaxKind.Identifier) {
+                let id = <ts.Identifier>node;
                 let symbol = self.checker.getSymbolAtLocation(<ts.Identifier>node);
-                //console.log(symbol);
-                console.log(node.parent.kind);
-
-                //emit ref here
-                self._emitRef(node, symbol);
+                if (!self._isDeclarationIdentifier(id)) {
+                    //emit ref here
+                    self._emitRef(node, symbol);
+                }
+            } else {
+                ts.forEachChild(node, _collectRefs);
             }
         }
 
         function _collectDefs(node: ts.Node) {
             switch (node.kind) {
                 case ts.SyntaxKind.ClassDeclaration:
-                    let classSym = self.checker.getSymbolAtLocation((<ts.ClassDeclaration>node).name);
+                    let classDecl = <ts.ClassDeclaration>node;
+                    let classSym = self.checker.getSymbolAtLocation(classDecl.name);
+                    self.allDeclIds.push(classDecl.name);
+
                     //emit def here
-                    self._emitNamedDef(node, classSym, "class");
+                    self._emitDef(node, classSym, "class");
                     break;
 
                 case ts.SyntaxKind.FunctionDeclaration:
-                    let funSym = self.checker.getSymbolAtLocation((<ts.FunctionDeclaration>node).name);
+                    let funDecl = <ts.FunctionDeclaration>node;
+                    let funSym = self.checker.getSymbolAtLocation(funDecl.name);
+                    self.allDeclIds.push(funDecl.name);
 
                     //emit def here
-                    self._emitNamedDef(node, funSym, "function");
+                    self._emitDef(node, funSym, "function");
                     break;
                 case ts.SyntaxKind.MethodDeclaration:
-                    let methodSym = self.checker.getSymbolAtLocation((<ts.MethodDeclaration>node).name);
+                    let methodDecl = <ts.MethodDeclaration>node;
+                    let methodSym = self.checker.getSymbolAtLocation(methodDecl.name);
+                    self.allDeclIds.push(<ts.Identifier>methodDecl.name);
 
                     //emit def here
-                    self._emitNamedDef(node, methodSym, "method");
+                    self._emitDef(node, methodSym, "method");
                     break;
                 case ts.SyntaxKind.VariableDeclaration:
-                    let varSym = self.checker.getSymbolAtLocation((<ts.VariableDeclaration>node).name);
+                    let varDecl = <ts.VariableDeclaration>node;
+                    let varSym = self.checker.getSymbolAtLocation(varDecl.name);
+                    self.allDeclIds.push(<ts.Identifier>varDecl.name);
 
                     //emit def here
-                    self._emitNamedDef(node, varSym, "var");
+                    self._emitDef(node, varSym, "var");
                     break;
                 case ts.SyntaxKind.Parameter:
-                    let paramSym = self.checker.getSymbolAtLocation((<ts.ParameterDeclaration>node).name);
+                    let paramDecl = <ts.ParameterDeclaration>node;
+                    let paramSym = self.checker.getSymbolAtLocation(paramDecl.name);
+                    self.allDeclIds.push(<ts.Identifier>paramDecl.name);
 
                     //emit def here
-                    self._emitNamedDef(node, paramSym, "param");
+                    self._emitDef(node, paramSym, "param");
                     break;
                 case ts.SyntaxKind.PropertyDeclaration:
-                    let fieldSym = self.checker.getSymbolAtLocation((<ts.PropertyDeclaration>node).name);
+                    let fieldDecl = <ts.PropertyDeclaration>node;
+                    let fieldSym: ts.Symbol = self.checker.getSymbolAtLocation(fieldDecl.name);
+                    self.allDeclIds.push(<ts.Identifier>fieldDecl.name);
 
                     //emit def here
-                    self._emitNamedDef(node, fieldSym, "property");
+                    self._emitDef(node, fieldSym, "property");
                     break;
             }
             ts.forEachChild(node, _collectDefs);
         }
     }
 
-    private _emitNamedDef(node: ts.Node, symbol: ts.Symbol, kind: string) {
+    private _isDeclarationIdentifier(id: ts.Identifier): boolean {
+        for (const declId of this.allDeclIds) {
+            if (declId.getStart() === id.getStart()
+                && declId.getEnd() === id.getEnd()
+                && declId.getSourceFile() === id.getSourceFile()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private _emitDef(node: ts.Node, symbol: ts.Symbol, kind: string) {
         //emitting def here
         var def: defs.Def = new defs.Def();
         def.Name = symbol.name;
