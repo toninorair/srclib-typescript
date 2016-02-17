@@ -14,7 +14,6 @@ program.
     command("graph").
     option("--debug-unit-file <debug-unit-file>").
     action(function(command) {
-        console.log("Inside graph function");
         new graph.GraphAction(command.debugUnitFile).execute()
     });
 program.command("depresolve").

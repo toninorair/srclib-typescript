@@ -1,6 +1,6 @@
 /// <reference path="def-and-ref-template.ts" />
 
-import {readFileSync} from "fs";
+import * as fs from "fs";
 import * as ts from "typescript";
 import defs = require('./def-and-ref-template');
 
@@ -11,11 +11,9 @@ export class ASTTraverse {
     private checker: ts.TypeChecker;
 
     constructor(fileNames: string[]) {
-        console.log(fileNames);
         this.program = ts.createProgram(fileNames, {
             target: ts.ScriptTarget.ES5, module: ts.ModuleKind.CommonJS
         });
-
         // Get the checker, we will use it to find more about classes
         this.checker = this.program.getTypeChecker();
 
@@ -24,54 +22,71 @@ export class ASTTraverse {
     }
 
     traverse() {
+        //firts pass - collecting all defs
         for (const sourceFile of this.program.getSourceFiles()) {
-            if (!sourceFile.hasNoDefaultLib) {
-                // Walk the tree to search for classes
-                console.log(sourceFile.fileName);
-                ts.forEachChild(sourceFile, _visit);
-            }
             var self = this;
-
-            function _visit(node: ts.Node) {
-
-                //             var classDecl: ts.ClassDeclaration = <ts.ClassDeclaration>node;
-                //         case ts.SyntaxKind.FunctionDeclaration:
-                //             var funcDecl: ts.FunctionDeclaration = <ts.FunctionDeclaration>node;
-                if (node.kind === ts.SyntaxKind.ClassDeclaration) {
-                    let symbol = self.checker.getSymbolAtLocation((<ts.ClassDeclaration>node).name);
-
-                    //emit def here
-                    self._emitNamedDef(node, symbol, "class");
-                    ts.forEachChild(node, _visit);
-                } else if (node.kind === ts.SyntaxKind.FunctionDeclaration) {
-                    let symbol = self.checker.getSymbolAtLocation((<ts.FunctionDeclaration>node).name);
-
-                    //emit def here
-                    self._emitNamedDef(node, symbol, "function");
-                    ts.forEachChild(node, _visit);
-                } else if (node.kind === ts.SyntaxKind.MethodDeclaration) {
-                    let symbol = self.checker.getSymbolAtLocation((<ts.MethodDeclaration>node).name);
-
-                    //emit def here
-                    self._emitNamedDef(node, symbol, "method");
-                    //ts.forEachChild(node, _visit);
-                } else if (node.kind === ts.SyntaxKind.PropertyAccessExpression) {
-                    let symbol = self.checker.getSymbolAtLocation((<ts.PropertyAccessExpression>node).name);
-
-                    //emit ref here
-                    self._emitRef(node, symbol);
-                    // let type = checker.typeToString(checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration));
-                } else if (node.kind === ts.SyntaxKind.Identifier) {
-                    let symbol = self.checker.getSymbolAtLocation(<ts.Identifier>node);
-
-                    //emit ref here
-                    self._emitRef(node, symbol);
-                } else {
-                    ts.forEachChild(node, _visit);
-                }
+            if (!sourceFile.hasNoDefaultLib) {
+                // Walk the ast tree to search for defs
+                ts.forEachChild(sourceFile, _collectDefs);
             }
         };
+
+        //second pass - collecting all refs
+        for (const sourceFile of this.program.getSourceFiles()) {
+            var self = this;
+            if (!sourceFile.hasNoDefaultLib) {
+                // Walk the ast tree to search for refs
+                ts.forEachChild(sourceFile, _collectRefs);
+            }
+        };
+        fs.writeFileSync("defs-refs.json", JSON.stringify(this.allObjects));
         console.log(JSON.stringify(this.allObjects));
+
+        function _collectRefs(node: ts.Node) {
+            if (node.kind === ts.SyntaxKind.PropertyAccessExpression) {
+                let symbol = self.checker.getSymbolAtLocation((<ts.PropertyAccessExpression>node).name);
+
+                //emit ref here
+                self._emitRef(node, symbol);
+            } else if (node.kind === ts.SyntaxKind.Identifier) {
+                let symbol = self.checker.getSymbolAtLocation(<ts.Identifier>node);
+                //console.log(symbol);
+                console.log(node.parent.kind);
+
+                //emit ref here
+                self._emitRef(node, symbol);
+            }
+        }
+
+        function _collectDefs(node: ts.Node) {
+            switch (node.kind) {
+                case ts.SyntaxKind.ClassDeclaration:
+                    let classSym = self.checker.getSymbolAtLocation((<ts.ClassDeclaration>node).name);
+                    //emit def here
+                    self._emitNamedDef(node, classSym, "class");
+                    break;
+
+                case ts.SyntaxKind.FunctionDeclaration:
+                    let funSym = self.checker.getSymbolAtLocation((<ts.FunctionDeclaration>node).name);
+
+                    //emit def here
+                    self._emitNamedDef(node, funSym, "function");
+                    break;
+                case ts.SyntaxKind.MethodDeclaration:
+                    let methodSym = self.checker.getSymbolAtLocation((<ts.MethodDeclaration>node).name);
+
+                    //emit def here
+                    self._emitNamedDef(node, methodSym, "method");
+                    break;
+                case ts.SyntaxKind.VariableDeclaration:
+                    let varSym = self.checker.getSymbolAtLocation((<ts.VariableDeclaration>node).name);
+
+                    //emit def here
+                    self._emitNamedDef(node, varSym, "var");
+                    break;
+            }
+            ts.forEachChild(node, _collectDefs);
+        }
     }
 
     private _emitNamedDef(node: ts.Node, symbol: ts.Symbol, kind: string) {
