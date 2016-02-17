@@ -134,13 +134,15 @@ export class ASTTraverse {
         //emitting def here
         var def: defs.Def = new defs.Def();
         def.Name = symbol.name;
-        def.Path = this.checker.getFullyQualifiedName(symbol);
+        //def.Path = this.checker.getFullyQualifiedName(symbol);
+        def.Path = this._getNamedScope(node.parent);
         def.Kind = kind;
         def.File = node.getSourceFile().fileName;
         def.DefStart = node.getStart();
         def.DefEnd = node.getEnd();
         this.allObjects.Defs.push(def);
-        //console.log(JSON.stringify(def));
+        // console.log(JSON.stringify(def));
+        // console.log("-------------------");
     }
 
     private _emitRef(node: ts.Node, symbol: ts.Symbol) {
@@ -152,22 +154,37 @@ export class ASTTraverse {
         ref.End = node.getEnd();
         this.allObjects.Refs.push(ref);
         // console.log(JSON.stringify(ref));
+        // console.log("-------------------");
+    }
+
+    private _getNamedScope(node: ts.Node, parentChain: string = ""): string {
+        if (!node || node.kind === ts.SyntaxKind.SourceFile) {
+            return parentChain;
+        }
+
+        switch (node.kind) {
+            case ts.SyntaxKind.ModuleDeclaration: {
+                let moduleDecl = <ts.ModuleDeclaration>node;
+                let name = moduleDecl.name.text;
+                return this._getNamedScope(node.parent, name + "." + parentChain);
+            }
+            case ts.SyntaxKind.ClassDeclaration: {
+                let classDecl = <ts.ClassDeclaration>node;
+                let name = classDecl.name.getText();
+                return this._getNamedScope(node.parent, name + "." + parentChain);
+            }
+            case ts.SyntaxKind.FunctionDeclaration: {
+                let funcDecl = <ts.FunctionDeclaration>node;
+                let name = funcDecl.name.getText();
+                return this._getNamedScope(node.parent, name + "." + parentChain);
+            }
+            case ts.SyntaxKind.MethodDeclaration: {
+                let methodDecl = <ts.MethodDeclaration>node;
+                let name = methodDecl.name.getText();
+                return this._getNamedScope(node.parent, name + "." + parentChain);
+            }
+            default:
+                return this._getNamedScope(node.parent, parentChain);
+        }
     }
 }
-
-// private _getParentChain(node: ts.Node, parentChain: string = "") {
-//
-//     if (!node) {
-//         return parentChain;
-//     }
-//     switch (node.kind) {
-//         case ts.SyntaxKind.ModuleDeclaration:
-//             var moduleDecl: ts.ModuleDeclaration = <ts.ModuleDeclaration>node;
-//         case ts.SyntaxKind.ClassDeclaration:
-//             var classDecl: ts.ClassDeclaration = <ts.ClassDeclaration>node;
-//         case ts.SyntaxKind.FunctionDeclaration:
-//             var funcDecl: ts.FunctionDeclaration = <ts.FunctionDeclaration>node;
-//
-//     }
-// }
-//
