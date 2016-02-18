@@ -52,14 +52,16 @@ export class ASTTraverse {
 
                 //emit ref here
                 self._emitRef(node, symbol);
-            } else if (node.kind === ts.SyntaxKind.Identifier) {
+            }
+
+            else if (node.kind === ts.SyntaxKind.Identifier) {
                 let id = <ts.Identifier>node;
                 let symbol = self.checker.getSymbolAtLocation(id);
                 if (!self._isDeclarationIdentifier(id)) {
                     //emit ref here
-                    //self._emitRef(node, symbol);
-                    //assuming that node is defined in the current scope
-                    self._emitRef(node, symbol, true);
+
+                    //get declaration and use its scope for path creation
+                    self._emitRef(symbol.valueDeclaration, symbol, true);
                 }
             } else {
                 ts.forEachChild(node, _collectRefs);
@@ -131,15 +133,15 @@ export class ASTTraverse {
                     self._emitDef(node, symbol, utils.DefKind.FIELD);
                     break;
                 }
-                 case ts.SyntaxKind.PropertySignature: {
-                  let decl = <ts.SignatureDeclaration>node;
-                  let symbol: ts.Symbol = self.checker.getSymbolAtLocation(decl.name);
+                case ts.SyntaxKind.PropertySignature: {
+                    let decl = <ts.SignatureDeclaration>node;
+                    let symbol: ts.Symbol = self.checker.getSymbolAtLocation(decl.name);
 
-                  self.allDeclIds.push(<ts.Identifier>decl.name);
+                    self.allDeclIds.push(<ts.Identifier>decl.name);
 
-                  //emit def here
-                  self._emitDef(node, symbol, utils.DefKind.FIELD);
-                  break;
+                    //emit def here
+                    self._emitDef(node, symbol, utils.DefKind.FIELD);
+                    break;
                 }
             }
             ts.forEachChild(node, _collectDefs);
@@ -169,10 +171,11 @@ export class ASTTraverse {
         def.DefStart = node.getStart();
         def.DefEnd = node.getEnd();
         this.allObjects.Defs.push(def);
-        console.log(JSON.stringify(def));
-        console.log("-------------------");
+        // console.log(JSON.stringify(def));
+        // console.log("-------------------");
     }
 
+    //now declaration is provided as node here
     private _emitRef(node: ts.Node, symbol: ts.Symbol, defineScope: boolean = false) {
         //emitting ref here
         var ref: defs.Ref = new defs.Ref();
@@ -187,8 +190,8 @@ export class ASTTraverse {
         ref.Start = node.getStart();
         ref.End = node.getEnd();
         this.allObjects.Refs.push(ref);
-        console.log(JSON.stringify(ref));
-        console.log("-------------------");
+        // console.log(JSON.stringify(ref));
+        // console.log("-------------------");
     }
 
     private _getNamedScope(node: ts.Node, parentChain: string = ""): string {
@@ -210,10 +213,10 @@ export class ASTTraverse {
                 return this._getNamedScope(node.parent, newChain);
             }
             case ts.SyntaxKind.InterfaceDeclaration: {
-              let decl = <ts.InterfaceDeclaration>node;
-              let name = decl.name.getText();
-              let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
-              return this._getNamedScope(node.parent, newChain);
+                let decl = <ts.InterfaceDeclaration>node;
+                let name = decl.name.getText();
+                let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
+                return this._getNamedScope(node.parent, newChain);
             }
             case ts.SyntaxKind.FunctionDeclaration: {
                 let decl = <ts.FunctionDeclaration>node;
@@ -227,6 +230,16 @@ export class ASTTraverse {
                 let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
                 return this._getNamedScope(node.parent, newChain);
             }
+            // case ts.SyntaxKind.VariableDeclaration: {
+            //     let decl = <ts.VariableDeclaration>node;
+            //     let init = decl.initializer;
+            //     //used for defining refs for creation of interfaces for example
+            //     if (init !== undefined && init.kind === ts.SyntaxKind.ObjectLiteralExpression) {
+            //         let typeName = decl.type.getText();
+            //         let newChain = (parentChain === "") ? typeName : typeName + utils.PATH_SEPARATOR + parentChain;
+            //         return this._getNamedScope(node.parent, newChain);
+            //     }
+            // }
             default:
                 return this._getNamedScope(node.parent, parentChain);
         }
