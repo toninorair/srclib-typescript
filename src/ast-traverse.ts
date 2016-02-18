@@ -12,7 +12,6 @@ export class ASTTraverse {
     private checker: ts.TypeChecker;
     private allDeclIds: Array<ts.Identifier>;
 
-
     constructor(fileNames: string[]) {
         this.program = ts.createProgram(fileNames, {
             target: ts.ScriptTarget.ES5, module: ts.ModuleKind.CommonJS
@@ -78,6 +77,15 @@ export class ASTTraverse {
                     self._emitDef(node, symbol, utils.DefKind.CLASS);
                     break;
                 }
+                case ts.SyntaxKind.InterfaceDeclaration: {
+                    let decl = <ts.InterfaceDeclaration>node;
+                    let symbol = self.checker.getSymbolAtLocation(decl.name);
+                    self.allDeclIds.push(decl.name);
+
+                    //emit def here
+                    self._emitDef(node, symbol, utils.DefKind.INTERFACE);
+                    break;
+                }
                 case ts.SyntaxKind.FunctionDeclaration: {
                     let decl = <ts.FunctionDeclaration>node;
                     let symbol = self.checker.getSymbolAtLocation(decl.name);
@@ -123,6 +131,16 @@ export class ASTTraverse {
                     self._emitDef(node, symbol, utils.DefKind.FIELD);
                     break;
                 }
+                 case ts.SyntaxKind.PropertySignature: {
+                  let decl = <ts.SignatureDeclaration>node;
+                  let symbol: ts.Symbol = self.checker.getSymbolAtLocation(decl.name);
+
+                  self.allDeclIds.push(<ts.Identifier>decl.name);
+
+                  //emit def here
+                  self._emitDef(node, symbol, utils.DefKind.FIELD);
+                  break;
+                }
             }
             ts.forEachChild(node, _collectDefs);
         }
@@ -151,8 +169,8 @@ export class ASTTraverse {
         def.DefStart = node.getStart();
         def.DefEnd = node.getEnd();
         this.allObjects.Defs.push(def);
-        // console.log(JSON.stringify(def));
-        // console.log("-------------------");
+        console.log(JSON.stringify(def));
+        console.log("-------------------");
     }
 
     private _emitRef(node: ts.Node, symbol: ts.Symbol, defineScope: boolean = false) {
@@ -169,8 +187,8 @@ export class ASTTraverse {
         ref.Start = node.getStart();
         ref.End = node.getEnd();
         this.allObjects.Refs.push(ref);
-        // console.log(JSON.stringify(ref));
-        // console.log("-------------------");
+        console.log(JSON.stringify(ref));
+        console.log("-------------------");
     }
 
     private _getNamedScope(node: ts.Node, parentChain: string = ""): string {
@@ -190,6 +208,12 @@ export class ASTTraverse {
                 let name = decl.name.getText();
                 let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
                 return this._getNamedScope(node.parent, newChain);
+            }
+            case ts.SyntaxKind.InterfaceDeclaration: {
+              let decl = <ts.InterfaceDeclaration>node;
+              let name = decl.name.getText();
+              let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
+              return this._getNamedScope(node.parent, newChain);
             }
             case ts.SyntaxKind.FunctionDeclaration: {
                 let decl = <ts.FunctionDeclaration>node;
