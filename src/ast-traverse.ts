@@ -51,22 +51,15 @@ export class ASTTraverse {
                 let id = <ts.Identifier>node;
                 let symbol = self.checker.getSymbolAtLocation(id);
                 if (!self._isDeclarationIdentifier(id)) {
-                    //emit ref here
-
-                    if (symbol.valueDeclaration !== undefined) {
-                        // console.log("SYMBOL = ", symbol.name);
-                        // console.log(symbol.valueDeclaration.getText());
-                        // console.log(symbol.valueDeclaration.kind);
-                        //get declaration and use its scope for path creation
+                    if (symbol !== undefined && symbol.valueDeclaration !== undefined) {
+                        //emit ref here
                         self._emitRef(symbol.valueDeclaration, symbol);
                     } else {
-                        console.log("UNDEF DECL FOR SYMBOL = ", symbol.name);
+                        console.log("UNDEF SYMBOL OR DECL FOR SYMBOL = ", id.text);
                     }
-
                 }
-            } else {
-                ts.forEachChild(node, _collectRefs);
             }
+            ts.forEachChild(node, _collectRefs);
         }
 
         function _collectDefs(node: ts.Node) {
@@ -201,8 +194,8 @@ export class ASTTraverse {
         def.DefStart = node.getStart();
         def.DefEnd = node.getEnd();
         this.allObjects.Defs.push(def);
-        // console.log(JSON.stringify(def));
-        // console.log("-------------------");
+        console.log(JSON.stringify(def));
+        console.log("-------------------");
     }
 
     //now declaration is provided as node here
@@ -215,8 +208,8 @@ export class ASTTraverse {
         ref.Start = node.getStart();
         ref.End = node.getEnd();
         this.allObjects.Refs.push(ref);
-        // console.log(JSON.stringify(ref));
-        // console.log("-------------------");
+        console.log(JSON.stringify(ref));
+        console.log("-------------------");
     }
 
     private _getNamedScope(node: ts.Node, parentChain: string = ""): string {
