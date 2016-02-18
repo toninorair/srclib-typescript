@@ -47,21 +47,22 @@ export class ASTTraverse {
         //console.log(JSON.stringify(this.allObjects));
 
         function _collectRefs(node: ts.Node) {
-            if (node.kind === ts.SyntaxKind.PropertyAccessExpression) {
-                let symbol = self.checker.getSymbolAtLocation((<ts.PropertyAccessExpression>node).name);
-
-                //emit ref here
-                self._emitRef(node, symbol);
-            }
-
-            else if (node.kind === ts.SyntaxKind.Identifier) {
+            if (node.kind === ts.SyntaxKind.Identifier) {
                 let id = <ts.Identifier>node;
                 let symbol = self.checker.getSymbolAtLocation(id);
                 if (!self._isDeclarationIdentifier(id)) {
                     //emit ref here
 
-                    //get declaration and use its scope for path creation
-                    self._emitRef(symbol.valueDeclaration, symbol, true);
+                    if (symbol.valueDeclaration !== undefined) {
+                        // console.log("SYMBOL = ", symbol.name);
+                        // console.log(symbol.valueDeclaration.getText());
+                        // console.log(symbol.valueDeclaration.kind);
+                        //get declaration and use its scope for path creation
+                        self._emitRef(symbol.valueDeclaration, symbol);
+                    } else {
+                        console.log("UNDEF DECL FOR SYMBOL = ", symbol.name);
+                    }
+
                 }
             } else {
                 ts.forEachChild(node, _collectRefs);
@@ -86,6 +87,15 @@ export class ASTTraverse {
 
                     //emit def here
                     self._emitDef(node, symbol, utils.DefKind.INTERFACE);
+                    break;
+                }
+                case ts.SyntaxKind.EnumDeclaration: {
+                    let decl = <ts.EnumDeclaration>node;
+                    let symbol = self.checker.getSymbolAtLocation(decl.name);
+                    self.allDeclIds.push(decl.name);
+
+                    //emit def here
+                    self._emitDef(node, symbol, utils.DefKind.ENUM);
                     break;
                 }
                 case ts.SyntaxKind.FunctionDeclaration: {
@@ -124,6 +134,15 @@ export class ASTTraverse {
                     self._emitDef(node, symbol, utils.DefKind.PARAM);
                     break;
                 }
+                case ts.SyntaxKind.EnumMember: {
+                    let decl = <ts.EnumMember>node;
+                    let symbol = self.checker.getSymbolAtLocation(decl.name);
+                    self.allDeclIds.push(<ts.Identifier>decl.name);
+
+                    //emit def here
+                    self._emitDef(node, symbol, utils.DefKind.ENUM_MEMBER);
+                    break;
+                }
                 case ts.SyntaxKind.PropertyDeclaration: {
                     let decl = <ts.PropertyDeclaration>node;
                     let symbol: ts.Symbol = self.checker.getSymbolAtLocation(decl.name);
@@ -133,6 +152,7 @@ export class ASTTraverse {
                     self._emitDef(node, symbol, utils.DefKind.FIELD);
                     break;
                 }
+                //FOR INTERFACES
                 case ts.SyntaxKind.PropertySignature: {
                     let decl = <ts.SignatureDeclaration>node;
                     let symbol: ts.Symbol = self.checker.getSymbolAtLocation(decl.name);
@@ -140,7 +160,17 @@ export class ASTTraverse {
                     self.allDeclIds.push(<ts.Identifier>decl.name);
 
                     //emit def here
-                    self._emitDef(node, symbol, utils.DefKind.FIELD);
+                    self._emitDef(node, symbol, utils.DefKind.PROPERTY_SIGNATURE);
+                    break;
+                }
+                case ts.SyntaxKind.MethodSignature: {
+                    let decl = <ts.SignatureDeclaration>node;
+                    let symbol: ts.Symbol = self.checker.getSymbolAtLocation(decl.name);
+
+                    self.allDeclIds.push(<ts.Identifier>decl.name);
+
+                    //emit def here
+                    self._emitDef(node, symbol, utils.DefKind.METHOD_SIGNATURE);
                     break;
                 }
             }
@@ -176,16 +206,11 @@ export class ASTTraverse {
     }
 
     //now declaration is provided as node here
-    private _emitRef(node: ts.Node, symbol: ts.Symbol, defineScope: boolean = false) {
+    private _emitRef(node: ts.Node, symbol: ts.Symbol) {
         //emitting ref here
         var ref: defs.Ref = new defs.Ref();
-        if (defineScope) {
-            var scopeRes: string = this._getNamedScope(node.parent);
-            ref.DefPath = (scopeRes === "") ? symbol.name : scopeRes + utils.PATH_SEPARATOR + symbol.name;
-        } else {
-            ref.DefPath = this.checker.getFullyQualifiedName(symbol);
-        }
-
+        var scopeRes: string = this._getNamedScope(node.parent);
+        ref.DefPath = (scopeRes === "") ? symbol.name : scopeRes + utils.PATH_SEPARATOR + symbol.name;
         ref.File = node.getSourceFile().fileName;
         ref.Start = node.getStart();
         ref.End = node.getEnd();
@@ -218,6 +243,12 @@ export class ASTTraverse {
                 let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
                 return this._getNamedScope(node.parent, newChain);
             }
+            case ts.SyntaxKind.EnumDeclaration: {
+                let decl = <ts.EnumDeclaration>node;
+                let name = decl.name.getText();
+                let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
+                return this._getNamedScope(node.parent, newChain);
+            }
             case ts.SyntaxKind.FunctionDeclaration: {
                 let decl = <ts.FunctionDeclaration>node;
                 let name = decl.name.getText();
@@ -230,16 +261,18 @@ export class ASTTraverse {
                 let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
                 return this._getNamedScope(node.parent, newChain);
             }
-            // case ts.SyntaxKind.VariableDeclaration: {
-            //     let decl = <ts.VariableDeclaration>node;
-            //     let init = decl.initializer;
-            //     //used for defining refs for creation of interfaces for example
-            //     if (init !== undefined && init.kind === ts.SyntaxKind.ObjectLiteralExpression) {
-            //         let typeName = decl.type.getText();
-            //         let newChain = (parentChain === "") ? typeName : typeName + utils.PATH_SEPARATOR + parentChain;
-            //         return this._getNamedScope(node.parent, newChain);
-            //     }
-            // }
+            case ts.SyntaxKind.PropertySignature: {
+                let decl = <ts.SignatureDeclaration>node;
+                let name = decl.name.getText();
+                let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
+                return this._getNamedScope(node.parent, newChain);
+            }
+            case ts.SyntaxKind.MethodSignature: {
+                let decl = <ts.SignatureDeclaration>node;
+                let name = decl.name.getText();
+                let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
+                return this._getNamedScope(node.parent, newChain);
+            }
             default:
                 return this._getNamedScope(node.parent, parentChain);
         }
