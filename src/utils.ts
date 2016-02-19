@@ -11,5 +11,8 @@ export class DefKind {
     static PROPERTY_SIGNATURE = "property signature";
     static METHOD_SIGNATURE = "method signature";
 }
+export function formFnSignatureForPath(sig: string): string {
+    return sig.trim().replace(";", "").replace(" ", "").replace(": ", ":").replace(":", "_");
+}
 
 export var PATH_SEPARATOR: string = ".";

@@ -51,11 +51,20 @@ export class ASTTraverse {
                 let id = <ts.Identifier>node;
                 let symbol = self.checker.getSymbolAtLocation(id);
                 if (!self._isDeclarationIdentifier(id)) {
-                    if (symbol !== undefined && symbol.valueDeclaration !== undefined) {
+                    if (symbol !== undefined) {
                         //emit ref here
-                        self._emitRef(symbol.valueDeclaration);
+                        if (symbol.valueDeclaration === undefined) {
+                            console.log("VALUE DECLARATION FOR ID", id.text, "IS UNDEFINED");
+                        }
+                        if (symbol.declarations.length > 1) {
+                            console.log("MORE THAN ONE DECLARATION FOR ID", id.text, "WAS FOUND")
+                        }
+                        //get all possible declarations
+                        for (const decl of symbol.declarations) {
+                            self._emitRef(decl, id);
+                        }
                     } else {
-                        console.log("UNDEF SYMBOL OR DECL FOR SYMBOL = ", id.text);
+                        console.log("UNDEF SYMBOL", id.text);
                     }
                 }
             }
@@ -66,7 +75,6 @@ export class ASTTraverse {
             switch (node.kind) {
                 case ts.SyntaxKind.ClassDeclaration: {
                     let decl = <ts.ClassDeclaration>node;
-                    let symbol = self.checker.getSymbolAtLocation(decl.name);
                     self.allDeclIds.push(decl.name);
 
                     //emit def here
@@ -75,7 +83,6 @@ export class ASTTraverse {
                 }
                 case ts.SyntaxKind.InterfaceDeclaration: {
                     let decl = <ts.InterfaceDeclaration>node;
-                    let symbol = self.checker.getSymbolAtLocation(decl.name);
                     self.allDeclIds.push(decl.name);
 
                     //emit def here
@@ -84,7 +91,6 @@ export class ASTTraverse {
                 }
                 case ts.SyntaxKind.EnumDeclaration: {
                     let decl = <ts.EnumDeclaration>node;
-                    let symbol = self.checker.getSymbolAtLocation(decl.name);
                     self.allDeclIds.push(decl.name);
 
                     //emit def here
@@ -93,7 +99,6 @@ export class ASTTraverse {
                 }
                 case ts.SyntaxKind.FunctionDeclaration: {
                     let decl = <ts.FunctionDeclaration>node;
-                    let symbol = self.checker.getSymbolAtLocation(decl.name);
                     self.allDeclIds.push(decl.name);
 
                     //emit def here
@@ -102,7 +107,6 @@ export class ASTTraverse {
                 }
                 case ts.SyntaxKind.MethodDeclaration: {
                     let decl = <ts.MethodDeclaration>node;
-                    let symbol = self.checker.getSymbolAtLocation(decl.name);
                     self.allDeclIds.push(<ts.Identifier>decl.name);
 
                     //emit def here
@@ -111,7 +115,6 @@ export class ASTTraverse {
                 }
                 case ts.SyntaxKind.VariableDeclaration: {
                     let decl = <ts.VariableDeclaration>node;
-                    let symbol = self.checker.getSymbolAtLocation(decl.name);
                     self.allDeclIds.push(<ts.Identifier>decl.name);
 
                     //emit def here
@@ -120,7 +123,6 @@ export class ASTTraverse {
                 }
                 case ts.SyntaxKind.Parameter: {
                     let decl = <ts.ParameterDeclaration>node;
-                    let symbol = self.checker.getSymbolAtLocation(decl.name);
                     self.allDeclIds.push(<ts.Identifier>decl.name);
 
                     //emit def here
@@ -129,7 +131,6 @@ export class ASTTraverse {
                 }
                 case ts.SyntaxKind.EnumMember: {
                     let decl = <ts.EnumMember>node;
-                    let symbol = self.checker.getSymbolAtLocation(decl.name);
                     self.allDeclIds.push(<ts.Identifier>decl.name);
 
                     //emit def here
@@ -138,7 +139,6 @@ export class ASTTraverse {
                 }
                 case ts.SyntaxKind.PropertyDeclaration: {
                     let decl = <ts.PropertyDeclaration>node;
-                    let symbol: ts.Symbol = self.checker.getSymbolAtLocation(decl.name);
                     self.allDeclIds.push(<ts.Identifier>decl.name);
 
                     //emit def here
@@ -148,8 +148,6 @@ export class ASTTraverse {
                 //FOR INTERFACES
                 case ts.SyntaxKind.PropertySignature: {
                     let decl = <ts.SignatureDeclaration>node;
-                    let symbol: ts.Symbol = self.checker.getSymbolAtLocation(decl.name);
-
                     self.allDeclIds.push(<ts.Identifier>decl.name);
 
                     //emit def here
@@ -158,11 +156,6 @@ export class ASTTraverse {
                 }
                 case ts.SyntaxKind.MethodSignature: {
                     let decl = <ts.SignatureDeclaration>node;
-                    //console.log("METHOD SIGN = ", decl.getText());
-
-                    let symbol: ts.Symbol = self.checker.getSymbolAtLocation(decl.name);
-                    //console.log("SIGN = ", self.checker.typeToString(self.checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration)));
-
                     self.allDeclIds.push(<ts.Identifier>decl.name);
 
                     //emit def here
@@ -203,25 +196,27 @@ export class ASTTraverse {
     }
 
     //now declaration is provided as node here
-    private _emitRef(node: ts.Declaration) {
+    private _emitRef(node: ts.Declaration, id: ts.Identifier) {
         //emitting ref here
         var ref: defs.Ref = new defs.Ref();
         var scopeRes: string = this._getNamedScope(node.parent);
         var nameForScope: string = this._getScopeNameForDeclaration(node);
         ref.DefPath = (scopeRes === "") ? nameForScope : scopeRes + utils.PATH_SEPARATOR + nameForScope;
-        ref.File = node.getSourceFile().fileName;
-        ref.Start = node.getStart();
-        ref.End = node.getEnd();
+        ref.File = id.getSourceFile().fileName;
+        ref.Start = id.getStart();
+        ref.End = id.getEnd();
         this.allObjects.Refs.push(ref);
         console.log(JSON.stringify(ref));
         console.log("-------------------");
     }
 
+
+
     private _getScopeNameForDeclaration(decl: ts.Declaration): string {
         switch (decl.kind) {
             case ts.SyntaxKind.MethodDeclaration:
             case ts.SyntaxKind.MethodSignature:
-                return decl.getText();
+                return utils.formFnSignatureForPath(decl.getText());
             default:
                 return (<ts.Identifier>decl.name).text;
         }
