@@ -210,11 +210,8 @@ export class ASTTraverse {
         console.log("-------------------");
     }
 
-
-
     private _getScopeNameForDeclaration(decl: ts.Declaration): string {
         switch (decl.kind) {
-            case ts.SyntaxKind.MethodDeclaration:
             case ts.SyntaxKind.MethodSignature:
                 return utils.formFnSignatureForPath(decl.getText());
             default:

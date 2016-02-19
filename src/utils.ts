@@ -12,7 +12,7 @@ export class DefKind {
     static METHOD_SIGNATURE = "method signature";
 }
 export function formFnSignatureForPath(sig: string): string {
-    return sig.trim().replace(";", "").replace(" ", "").replace(": ", ":").replace(":", "_");
+    return sig.trim().replace(';', '').replace(' ', '').replace(/:\s*/g, "_");;
 }
 
 export var PATH_SEPARATOR: string = ".";
