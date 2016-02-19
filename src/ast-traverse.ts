@@ -273,6 +273,13 @@ export class ASTTraverse {
                 let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
                 return this._getNamedScope(node.parent, newChain);
             }
+            //added for built-in initialization
+            case ts.SyntaxKind.VariableDeclaration: {
+                let decl = <ts.VariableDeclaration>node;
+                let name = decl.type.getText();
+                let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
+                return this._getNamedScope(node.parent, newChain);
+            }
             default:
                 return this._getNamedScope(node.parent, parentChain);
         }
