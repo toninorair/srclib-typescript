@@ -3,7 +3,7 @@
 import unit = require('./unit');
 
 var D_TS_SUFFIX: string = 'd.ts';
-var TESTS_DIR: string = '/Users/tonya/typescript-tests/';
+var TESTS_DIR: string = '.';
 
 var fs = require('fs');
 var path = require('path');

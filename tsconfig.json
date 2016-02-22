@@ -2,7 +2,7 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "es5",
-    "out": ".bin/srclib-typescript.js"
+    "outDir": ".bin"
   },
   "files": [
     "src/unit.ts",
