@@ -10,6 +10,8 @@ export class DefKind {
     static ENUM_MEMBER: string = "enum member";
     static PROPERTY_SIGNATURE = "property signature";
     static METHOD_SIGNATURE = "method signature";
+    static MODULE = "module";
+    static IMPORT_VAR = "imported var"
 }
 export function formFnSignatureForPath(sig: string): string {
     return sig.trim().replace(';', '').replace(' ', '').replace(/:\s*/g, "_");;

@@ -29,7 +29,10 @@ export class ASTTraverse {
         //firts pass - collecting all defs
         for (const sourceFile of this.program.getSourceFiles()) {
             var self = this;
-            if (!sourceFile.hasNoDefaultLib) {
+
+            //check whether it is actual source file for analysis
+            //if (!sourceFile.hasNoDefaultLib) {
+            if (self.program.getRootFileNames().indexOf(sourceFile.fileName) != -1) {
                 // Walk the ast tree to search for defs
                 ts.forEachChild(sourceFile, _collectDefs);
             }
@@ -38,7 +41,9 @@ export class ASTTraverse {
         //second pass - collecting all refs
         for (const sourceFile of this.program.getSourceFiles()) {
             var self = this;
-            if (!sourceFile.hasNoDefaultLib) {
+            //check whether it is actual source file for analysis
+            //if (!sourceFile.hasNoDefaultLib) {
+            if (self.program.getRootFileNames().indexOf(sourceFile.fileName) != -1) {
                 // Walk the ast tree to search for refs
                 ts.forEachChild(sourceFile, _collectRefs);
             }
@@ -61,6 +66,9 @@ export class ASTTraverse {
                         }
                         //get all possible declarations
                         for (const decl of symbol.declarations) {
+                            if (symbol.declarations.length > 1) {
+                                console.log("DECL for symbol", symbol.name, " = ", decl.getText());
+                            }
                             self._emitRef(decl, id, self._isBlockedScopeSymbol(symbol));
                         }
                     } else {
@@ -73,6 +81,14 @@ export class ASTTraverse {
 
         function _collectDefs(node: ts.Node) {
             switch (node.kind) {
+                case ts.SyntaxKind.ModuleDeclaration: {
+                    let decl = <ts.ModuleDeclaration>node;
+                    self.allDeclIds.push(decl.name);
+
+                    //emit def here
+                    self._emitDef(decl, utils.DefKind.MODULE);
+                    break;
+                }
                 case ts.SyntaxKind.ClassDeclaration: {
                     let decl = <ts.ClassDeclaration>node;
                     self.allDeclIds.push(decl.name);
@@ -120,6 +136,14 @@ export class ASTTraverse {
 
                     //emit def here
                     self._emitDef(decl, utils.DefKind.VAR, self._isBlockedScopeSymbol(symbol));
+                    break;
+                }
+                case ts.SyntaxKind.ImportEqualsDeclaration: {
+                    let decl = <ts.ImportEqualsDeclaration>node;
+                    self.allDeclIds.push(<ts.Identifier>decl.name);
+
+                    //emit def here
+                    self._emitDef(decl, utils.DefKind.IMPORT_VAR);
                     break;
                 }
                 case ts.SyntaxKind.Parameter: {
@@ -196,8 +220,8 @@ export class ASTTraverse {
         def.DefStart = node.getStart();
         def.DefEnd = node.getEnd();
         this.allObjects.Defs.push(def);
-        // console.log(JSON.stringify(def));
-        // console.log("-------------------");
+        console.log(JSON.stringify(def));
+        console.log("-------------------");
     }
 
     //now declaration is provided as node here
@@ -211,8 +235,8 @@ export class ASTTraverse {
         ref.Start = id.getStart();
         ref.End = id.getEnd();
         this.allObjects.Refs.push(ref);
-        // console.log(JSON.stringify(ref));
-        // console.log("-------------------");
+        console.log(JSON.stringify(ref));
+        console.log("-------------------");
     }
 
     private _getScopeNameForDeclaration(decl: ts.Declaration): string {
