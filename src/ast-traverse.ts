@@ -115,6 +115,40 @@ export class ASTTraverse {
         }
     }
 
+    private _emitDef(decl: ts.Declaration, blockedScope: boolean = false) {
+        //emitting def here
+        var def: defs.Def = new defs.Def();
+        var id: ts.Identifier = <ts.Identifier>decl.name;
+        def.Name = id.text;
+        //def.Path = this.checker.getFullyQualifiedName(symbol);
+        var scopeRes: string = this._getScopesChain(decl.parent, blockedScope);
+        var declNameInScope: string = this._getScopeNameForDeclaration(decl);
+        def.Path = (scopeRes === "") ? declNameInScope : scopeRes + utils.PATH_SEPARATOR + declNameInScope;
+        def.Kind = this._getDeclarationKindName(decl.kind, true);
+        def.File = decl.getSourceFile().fileName;
+        def.DefStart = id.getStart();
+        def.DefEnd = id.getEnd();
+        this.allObjects.Defs.push(def);
+        // console.log(JSON.stringify(def));
+        // console.log("-------------------");
+    }
+
+    //now declaration is provided as node here
+    private _emitRef(decl: ts.Declaration, id: ts.Identifier, blockedScope: boolean = false) {
+        //emitting ref here
+        var ref: defs.Ref = new defs.Ref();
+        var scopeRes: string = this._getScopesChain(decl.parent, blockedScope);
+        var declNameInScope: string = this._getScopeNameForDeclaration(decl);
+        ref.DefPath = (scopeRes === "") ? declNameInScope : scopeRes + utils.PATH_SEPARATOR + declNameInScope;
+        ref.File = id.getSourceFile().fileName;
+        ref.Start = id.getStart();
+        ref.End = id.getEnd();
+        ref.End = id.getEnd();
+        this.allObjects.Refs.push(ref);
+        // console.log(JSON.stringify(ref));
+        // console.log("-------------------");
+    }
+
     private _isBlockedScopeSymbol(symbol: ts.Symbol): boolean {
         return (symbol.flags & ts.SymbolFlags.BlockScoped) != 0;
     }
@@ -162,44 +196,11 @@ export class ASTTraverse {
         }
     }
 
-    private _emitDef(decl: ts.Declaration, blockedScope: boolean = false) {
-        //emitting def here
-        var def: defs.Def = new defs.Def();
-        var id: ts.Identifier = <ts.Identifier>decl.name;
-        def.Name = id.text;
-        //def.Path = this.checker.getFullyQualifiedName(symbol);
-        var scopeRes: string = this._getScopesChain(decl.parent, blockedScope);
-        var declNameInScope: string = this._getScopeNameForDeclaration(decl);
-        def.Path = (scopeRes === "") ? declNameInScope : scopeRes + utils.PATH_SEPARATOR + declNameInScope;
-        def.Kind = this._getDeclarationKindName(decl.kind, true);
-        def.File = decl.getSourceFile().fileName;
-        def.DefStart = id.getStart();
-        def.DefEnd = id.getEnd();
-        this.allObjects.Defs.push(def);
-        // console.log(JSON.stringify(def));
-        // console.log("-------------------");
-    }
-
-    //now declaration is provided as node here
-    private _emitRef(decl: ts.Declaration, id: ts.Identifier, blockedScope: boolean = false) {
-        //emitting ref here
-        var ref: defs.Ref = new defs.Ref();
-        var scopeRes: string = this._getScopesChain(decl.parent, blockedScope);
-        var declNameInScope: string = this._getScopeNameForDeclaration(decl);
-        ref.DefPath = (scopeRes === "") ? declNameInScope : scopeRes + utils.PATH_SEPARATOR + declNameInScope;
-        ref.File = id.getSourceFile().fileName;
-        ref.Start = id.getStart();
-        ref.End = id.getEnd();
-        ref.End = id.getEnd();
-        this.allObjects.Refs.push(ref);
-        // console.log(JSON.stringify(ref));
-        // console.log("-------------------");
-    }
-
     private _getScopeNameForDeclaration(decl: ts.Declaration): string {
         switch (decl.kind) {
+            //TODO change names of method, using type from typechecker
             case ts.SyntaxKind.MethodSignature:
-                return utils.formFnSignatureForPath(decl.getText());
+                return this._getDeclarationKindName(decl.kind) + "__" + utils.formFnSignatureForPath(decl.getText());
             default:
                 return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text;
         }
