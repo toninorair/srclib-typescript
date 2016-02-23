@@ -129,8 +129,8 @@ export class ASTTraverse {
         def.DefStart = id.getStart();
         def.DefEnd = id.getEnd();
         this.allObjects.Defs.push(def);
-        // console.log(JSON.stringify(def));
-        // console.log("-------------------");
+        console.error(JSON.stringify(def));
+        console.error("-------------------");
     }
 
     //now declaration is provided as node here
@@ -145,8 +145,8 @@ export class ASTTraverse {
         ref.End = id.getEnd();
         ref.End = id.getEnd();
         this.allObjects.Refs.push(ref);
-        // console.log(JSON.stringify(ref));
-        // console.log("-------------------");
+        console.error(JSON.stringify(ref));
+        console.error("-------------------");
     }
 
     private _isBlockedScopeSymbol(symbol: ts.Symbol): boolean {
@@ -193,6 +193,8 @@ export class ASTTraverse {
                 return fullName ? utils.DefKind.PROPERTY_SIGNATURE : "property_sig";
             case ts.SyntaxKind.MethodSignature:
                 return fullName ? utils.DefKind.METHOD_SIGNATURE : "method_sig";
+            // case ts.SyntaxKind.PropertyAssignment:
+            //     return fullName ? utils.DefKind.PROPERTY_SIGNATURE : "property_sig";
         }
     }
 
@@ -201,6 +203,9 @@ export class ASTTraverse {
             //TODO change names of method, using type from typechecker
             case ts.SyntaxKind.MethodSignature:
                 return this._getDeclarationKindName(decl.kind) + "__" + utils.formFnSignatureForPath(decl.getText());
+            //TODO check if it's the best decision
+            case ts.SyntaxKind.PropertyAssignment:
+                return "property_sig" + "__" + (<ts.Identifier>decl.name).text;
             default:
                 return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text;
         }
@@ -229,7 +234,8 @@ export class ASTTraverse {
             //added for built-in interface initialization
             case ts.SyntaxKind.VariableDeclaration: {
                 let decl = <ts.VariableDeclaration>node;
-                let name = decl.type.getText();
+                //TODO temporary decision - find better one
+                let name = "interface" + "__" + decl.type.getText();
                 let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
                 return this._getScopesChain(node.parent, blockedScope, newChain);
             }
