@@ -81,110 +81,33 @@ export class ASTTraverse {
 
         function _collectDefs(node: ts.Node) {
             switch (node.kind) {
-                case ts.SyntaxKind.ModuleDeclaration: {
-                    let decl = <ts.ModuleDeclaration>node;
-                    self.allDeclIds.push(decl.name);
-
-                    //emit def here
-                    self._emitDef(decl, utils.DefKind.MODULE);
-                    break;
-                }
-                case ts.SyntaxKind.ClassDeclaration: {
-                    let decl = <ts.ClassDeclaration>node;
-                    self.allDeclIds.push(decl.name);
-
-                    //emit def here
-                    self._emitDef(decl, utils.DefKind.CLASS);
-                    break;
-                }
-                case ts.SyntaxKind.InterfaceDeclaration: {
-                    let decl = <ts.InterfaceDeclaration>node;
-                    self.allDeclIds.push(decl.name);
-
-                    //emit def here
-                    self._emitDef(decl, utils.DefKind.INTERFACE);
-                    break;
-                }
-                case ts.SyntaxKind.EnumDeclaration: {
-                    let decl = <ts.EnumDeclaration>node;
-                    self.allDeclIds.push(decl.name);
-
-                    //emit def here
-                    self._emitDef(decl, utils.DefKind.ENUM);
-                    break;
-                }
-                case ts.SyntaxKind.FunctionDeclaration: {
-                    let decl = <ts.FunctionDeclaration>node;
-                    self.allDeclIds.push(decl.name);
-
-                    //emit def here
-                    self._emitDef(decl, utils.DefKind.FUNC);
-                    break;
-                }
-                case ts.SyntaxKind.MethodDeclaration: {
-                    let decl = <ts.MethodDeclaration>node;
+                case ts.SyntaxKind.ModuleDeclaration:
+                case ts.SyntaxKind.ClassDeclaration:
+                case ts.SyntaxKind.InterfaceDeclaration:
+                case ts.SyntaxKind.EnumDeclaration:
+                case ts.SyntaxKind.FunctionDeclaration:
+                case ts.SyntaxKind.MethodDeclaration:
+                case ts.SyntaxKind.ImportEqualsDeclaration:
+                case ts.SyntaxKind.Parameter:
+                case ts.SyntaxKind.EnumMember:
+                case ts.SyntaxKind.PropertyDeclaration:
+                //FOR INTERFACES
+                case ts.SyntaxKind.PropertySignature:
+                case ts.SyntaxKind.MethodSignature:
+                    let decl = <ts.Declaration>node;
                     self.allDeclIds.push(<ts.Identifier>decl.name);
 
                     //emit def here
-                    self._emitDef(decl, utils.DefKind.METHOD);
+                    self._emitDef(decl);
                     break;
-                }
+
                 case ts.SyntaxKind.VariableDeclaration: {
                     let decl = <ts.VariableDeclaration>node;
                     self.allDeclIds.push(<ts.Identifier>decl.name);
                     let symbol = self.checker.getSymbolAtLocation(decl.name);
 
                     //emit def here
-                    self._emitDef(decl, utils.DefKind.VAR, self._isBlockedScopeSymbol(symbol));
-                    break;
-                }
-                case ts.SyntaxKind.ImportEqualsDeclaration: {
-                    let decl = <ts.ImportEqualsDeclaration>node;
-                    self.allDeclIds.push(<ts.Identifier>decl.name);
-
-                    //emit def here
-                    self._emitDef(decl, utils.DefKind.IMPORT_VAR);
-                    break;
-                }
-                case ts.SyntaxKind.Parameter: {
-                    let decl = <ts.ParameterDeclaration>node;
-                    self.allDeclIds.push(<ts.Identifier>decl.name);
-
-                    //emit def here
-                    self._emitDef(decl, utils.DefKind.PARAM);
-                    break;
-                }
-                case ts.SyntaxKind.EnumMember: {
-                    let decl = <ts.EnumMember>node;
-                    self.allDeclIds.push(<ts.Identifier>decl.name);
-
-                    //emit def here
-                    self._emitDef(decl, utils.DefKind.ENUM_MEMBER);
-                    break;
-                }
-                case ts.SyntaxKind.PropertyDeclaration: {
-                    let decl = <ts.PropertyDeclaration>node;
-                    self.allDeclIds.push(<ts.Identifier>decl.name);
-
-                    //emit def here
-                    self._emitDef(decl, utils.DefKind.FIELD);
-                    break;
-                }
-                //FOR INTERFACES
-                case ts.SyntaxKind.PropertySignature: {
-                    let decl = <ts.SignatureDeclaration>node;
-                    self.allDeclIds.push(<ts.Identifier>decl.name);
-
-                    //emit def here
-                    self._emitDef(decl, utils.DefKind.PROPERTY_SIGNATURE);
-                    break;
-                }
-                case ts.SyntaxKind.MethodSignature: {
-                    let decl = <ts.SignatureDeclaration>node;
-                    self.allDeclIds.push(<ts.Identifier>decl.name);
-
-                    //emit def here
-                    self._emitDef(decl, utils.DefKind.METHOD_SIGNATURE);
+                    self._emitDef(decl, self._isBlockedScopeSymbol(symbol));
                     break;
                 }
             }
@@ -207,17 +130,49 @@ export class ASTTraverse {
         return false;
     }
 
-    private _emitDef(node: ts.Declaration, kind: string, blockedScope: boolean = false) {
+    private _getDeclarationKindName(kind: ts.SyntaxKind, fullName: boolean = false) {
+        switch (kind) {
+            case ts.SyntaxKind.ModuleDeclaration:
+                return fullName ? utils.DefKind.MODULE : "module";
+            case ts.SyntaxKind.ClassDeclaration:
+                return fullName ? utils.DefKind.CLASS : "class";
+            case ts.SyntaxKind.InterfaceDeclaration:
+                return fullName ? utils.DefKind.INTERFACE : "interface";
+            case ts.SyntaxKind.EnumDeclaration:
+                return fullName ? utils.DefKind.ENUM : "enum";
+            case ts.SyntaxKind.FunctionDeclaration:
+                return fullName ? utils.DefKind.FUNC : "func";
+            case ts.SyntaxKind.MethodDeclaration:
+                return fullName ? utils.DefKind.METHOD : "method";
+            case ts.SyntaxKind.VariableDeclaration:
+                return fullName ? utils.DefKind.VAR : "var";
+            case ts.SyntaxKind.ImportEqualsDeclaration:
+                return fullName ? utils.DefKind.IMPORT_VAR : "var";
+            case ts.SyntaxKind.Parameter:
+                return fullName ? utils.DefKind.PARAM : "param";
+            case ts.SyntaxKind.EnumMember:
+                return fullName ? utils.DefKind.ENUM_MEMBER : "enum_val";
+            case ts.SyntaxKind.PropertyDeclaration:
+                return fullName ? utils.DefKind.FIELD : "field";
+            //FOR INTERFACES
+            case ts.SyntaxKind.PropertySignature:
+                return fullName ? utils.DefKind.PROPERTY_SIGNATURE : "property_sig";
+            case ts.SyntaxKind.MethodSignature:
+                return fullName ? utils.DefKind.METHOD_SIGNATURE : "method_sig";
+        }
+    }
+
+    private _emitDef(decl: ts.Declaration, blockedScope: boolean = false) {
         //emitting def here
         var def: defs.Def = new defs.Def();
-        var id: ts.Identifier = <ts.Identifier>node.name;
+        var id: ts.Identifier = <ts.Identifier>decl.name;
         def.Name = id.text;
         //def.Path = this.checker.getFullyQualifiedName(symbol);
-        var scopeRes: string = this._getNamedScope(node.parent, blockedScope);
-        var nameForScope: string = this._getScopeNameForDeclaration(node);
-        def.Path = (scopeRes === "") ? nameForScope : scopeRes + utils.PATH_SEPARATOR + nameForScope;
-        def.Kind = kind;
-        def.File = node.getSourceFile().fileName;
+        var scopeRes: string = this._getScopesChain(decl.parent, blockedScope);
+        var declNameInScope: string = this._getScopeNameForDeclaration(decl);
+        def.Path = (scopeRes === "") ? declNameInScope : scopeRes + utils.PATH_SEPARATOR + declNameInScope;
+        def.Kind = this._getDeclarationKindName(decl.kind, true);
+        def.File = decl.getSourceFile().fileName;
         def.DefStart = id.getStart();
         def.DefEnd = id.getEnd();
         this.allObjects.Defs.push(def);
@@ -226,12 +181,12 @@ export class ASTTraverse {
     }
 
     //now declaration is provided as node here
-    private _emitRef(node: ts.Declaration, id: ts.Identifier, blockedScope: boolean = false) {
+    private _emitRef(decl: ts.Declaration, id: ts.Identifier, blockedScope: boolean = false) {
         //emitting ref here
         var ref: defs.Ref = new defs.Ref();
-        var scopeRes: string = this._getNamedScope(node.parent, blockedScope);
-        var nameForScope: string = this._getScopeNameForDeclaration(node);
-        ref.DefPath = (scopeRes === "") ? nameForScope : scopeRes + utils.PATH_SEPARATOR + nameForScope;
+        var scopeRes: string = this._getScopesChain(decl.parent, blockedScope);
+        var declNameInScope: string = this._getScopeNameForDeclaration(decl);
+        ref.DefPath = (scopeRes === "") ? declNameInScope : scopeRes + utils.PATH_SEPARATOR + declNameInScope;
         ref.File = id.getSourceFile().fileName;
         ref.Start = id.getStart();
         ref.End = id.getEnd();
@@ -246,11 +201,11 @@ export class ASTTraverse {
             case ts.SyntaxKind.MethodSignature:
                 return utils.formFnSignatureForPath(decl.getText());
             default:
-                return decl.kind + "__" + (<ts.Identifier>decl.name).text;
+                return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text;
         }
     }
 
-    private _getNamedScope(node: ts.Node, blockedScope: boolean, parentChain: string = ""): string {
+    private _getScopesChain(node: ts.Node, blockedScope: boolean, parentChain: string = ""): string {
         if (!node || node.kind === ts.SyntaxKind.SourceFile) {
             return parentChain;
         }
@@ -267,25 +222,25 @@ export class ASTTraverse {
                 let decl = <ts.Declaration>node;
                 let name = this._getScopeNameForDeclaration(decl);
                 let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
-                return this._getNamedScope(node.parent, blockedScope, newChain);
+                return this._getScopesChain(node.parent, blockedScope, newChain);
             }
 
-            //added for built-in initialization
+            //added for built-in interface initialization
             case ts.SyntaxKind.VariableDeclaration: {
                 let decl = <ts.VariableDeclaration>node;
                 let name = decl.type.getText();
                 let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
-                return this._getNamedScope(node.parent, blockedScope, newChain);
+                return this._getScopesChain(node.parent, blockedScope, newChain);
             }
             case ts.SyntaxKind.Block: {
                 if (blockedScope) {
                     let decl = <ts.Block>node;
                     let newChain: string = (parentChain === "") ? "" + decl.getStart() : decl.getStart() + utils.PATH_SEPARATOR + parentChain;
-                    return this._getNamedScope(node.parent, blockedScope, newChain);
+                    return this._getScopesChain(node.parent, blockedScope, newChain);
                 }
             }
             default:
-                return this._getNamedScope(node.parent, blockedScope, parentChain);
+                return this._getScopesChain(node.parent, blockedScope, parentChain);
         }
     }
 }
