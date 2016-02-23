@@ -48,8 +48,8 @@ export class ASTTraverse {
                 ts.forEachChild(sourceFile, _collectRefs);
             }
         };
-        fs.writeFileSync("defs-refs.json", JSON.stringify(this.allObjects));
-        //console.log(JSON.stringify(this.allObjects));
+
+        process.stdout.write(JSON.stringify(this.allObjects));
 
         function _collectRefs(node: ts.Node) {
             if (node.kind === ts.SyntaxKind.Identifier) {
@@ -59,20 +59,20 @@ export class ASTTraverse {
                     if (symbol !== undefined) {
                         //emit ref here
                         if (symbol.valueDeclaration === undefined) {
-                            console.log("VALUE DECLARATION FOR ID", id.text, "IS UNDEFINED");
+                            console.error("VALUE DECLARATION FOR ID", id.text, "IS UNDEFINED");
                         }
                         if (symbol.declarations.length > 1) {
-                            console.log("MORE THAN ONE DECLARATION FOR ID", id.text, "WAS FOUND")
+                            console.error("MORE THAN ONE DECLARATION FOR ID", id.text, "WAS FOUND")
                         }
                         //get all possible declarations
                         for (const decl of symbol.declarations) {
                             if (symbol.declarations.length > 1) {
-                                console.log("DECL for symbol", symbol.name, " = ", decl.getText());
+                                console.error("DECL for symbol", symbol.name, " = ", decl.getText());
                             }
                             self._emitRef(decl, id, self._isBlockedScopeSymbol(symbol));
                         }
                     } else {
-                        console.log("UNDEF SYMBOL", id.text);
+                        console.error("UNDEF SYMBOL", id.text);
                     }
                 }
             }
@@ -210,18 +210,19 @@ export class ASTTraverse {
     private _emitDef(node: ts.Declaration, kind: string, blockedScope: boolean = false) {
         //emitting def here
         var def: defs.Def = new defs.Def();
-        def.Name = (<ts.Identifier>node.name).text;
+        var id: ts.Identifier = <ts.Identifier>node.name;
+        def.Name = id.text;
         //def.Path = this.checker.getFullyQualifiedName(symbol);
         var scopeRes: string = this._getNamedScope(node.parent, blockedScope);
         var nameForScope: string = this._getScopeNameForDeclaration(node);
         def.Path = (scopeRes === "") ? nameForScope : scopeRes + utils.PATH_SEPARATOR + nameForScope;
         def.Kind = kind;
         def.File = node.getSourceFile().fileName;
-        def.DefStart = node.getStart();
-        def.DefEnd = node.getEnd();
+        def.DefStart = id.getStart();
+        def.DefEnd = id.getEnd();
         this.allObjects.Defs.push(def);
-        console.log(JSON.stringify(def));
-        console.log("-------------------");
+        // console.log(JSON.stringify(def));
+        // console.log("-------------------");
     }
 
     //now declaration is provided as node here
@@ -234,9 +235,10 @@ export class ASTTraverse {
         ref.File = id.getSourceFile().fileName;
         ref.Start = id.getStart();
         ref.End = id.getEnd();
+        ref.End = id.getEnd();
         this.allObjects.Refs.push(ref);
-        console.log(JSON.stringify(ref));
-        console.log("-------------------");
+        // console.log(JSON.stringify(ref));
+        // console.log("-------------------");
     }
 
     private _getScopeNameForDeclaration(decl: ts.Declaration): string {
@@ -244,7 +246,7 @@ export class ASTTraverse {
             case ts.SyntaxKind.MethodSignature:
                 return utils.formFnSignatureForPath(decl.getText());
             default:
-                return (<ts.Identifier>decl.name).text;
+                return decl.kind + "__" + (<ts.Identifier>decl.name).text;
         }
     }
 
@@ -254,54 +256,20 @@ export class ASTTraverse {
         }
 
         switch (node.kind) {
-            case ts.SyntaxKind.ModuleDeclaration: {
-                let decl = <ts.ModuleDeclaration>node;
-                let name = this._getScopeNameForDeclaration(decl);
-                let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
-                return this._getNamedScope(node.parent, blockedScope, newChain);
-            }
-            case ts.SyntaxKind.ClassDeclaration: {
-                let decl = <ts.ClassDeclaration>node;
-                let name = this._getScopeNameForDeclaration(decl);
-                let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
-                return this._getNamedScope(node.parent, blockedScope, newChain);
-            }
-            case ts.SyntaxKind.InterfaceDeclaration: {
-                let decl = <ts.InterfaceDeclaration>node;
-                let name = this._getScopeNameForDeclaration(decl);
-                let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
-                return this._getNamedScope(node.parent, blockedScope, newChain);
-            }
-            case ts.SyntaxKind.EnumDeclaration: {
-                let decl = <ts.EnumDeclaration>node;
-                let name = this._getScopeNameForDeclaration(decl);
-                let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
-                return this._getNamedScope(node.parent, blockedScope, newChain);
-            }
-            case ts.SyntaxKind.FunctionDeclaration: {
-                let decl = <ts.FunctionDeclaration>node;
-                let name = this._getScopeNameForDeclaration(decl);
-                let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
-                return this._getNamedScope(node.parent, blockedScope, newChain);
-            }
-            case ts.SyntaxKind.MethodDeclaration: {
-                let decl = <ts.MethodDeclaration>node;
-                let name = this._getScopeNameForDeclaration(decl);
-                let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
-                return this._getNamedScope(node.parent, blockedScope, newChain);
-            }
-            case ts.SyntaxKind.PropertySignature: {
-                let decl = <ts.SignatureDeclaration>node;
-                let name = this._getScopeNameForDeclaration(decl);
-                let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
-                return this._getNamedScope(node.parent, blockedScope, newChain);
-            }
+            case ts.SyntaxKind.ModuleDeclaration:
+            case ts.SyntaxKind.ClassDeclaration:
+            case ts.SyntaxKind.InterfaceDeclaration:
+            case ts.SyntaxKind.EnumDeclaration:
+            case ts.SyntaxKind.FunctionDeclaration:
+            case ts.SyntaxKind.MethodDeclaration:
+            case ts.SyntaxKind.PropertySignature:
             case ts.SyntaxKind.MethodSignature: {
-                let decl = <ts.SignatureDeclaration>node;
+                let decl = <ts.Declaration>node;
                 let name = this._getScopeNameForDeclaration(decl);
                 let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
                 return this._getNamedScope(node.parent, blockedScope, newChain);
             }
+
             //added for built-in initialization
             case ts.SyntaxKind.VariableDeclaration: {
                 let decl = <ts.VariableDeclaration>node;
