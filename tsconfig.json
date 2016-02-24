@@ -15,6 +15,6 @@
     "src/ast-traverse.ts",
     "src/def-and-ref-template.ts",
     "src/utils.ts",
-    "typings/npm/npm.d.ts"
+    "src/module-resolver.ts"
   ]
 }

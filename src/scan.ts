@@ -12,8 +12,8 @@ import * as async from "async";
 var D_TS_SUFFIX: string = 'd.ts';
 var TESTS_DIR: string = '.';
 
-var fs = require('fs');
-var path = require('path');
+import fs = require('fs');
+import path = require('path');
 var tsconfig = require('tsconfig');
 
 export class ScanAction implements Action {

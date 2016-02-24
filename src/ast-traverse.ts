@@ -3,8 +3,11 @@
 
 import * as fs from "fs";
 import * as ts from "typescript";
+import * as path from "path";
+
 import defs = require('./def-and-ref-template');
 import utils = require('./utils');
+import resolver = require('./module-resolver');
 
 export class ASTTraverse {
 
@@ -12,6 +15,8 @@ export class ASTTraverse {
     private program: ts.Program;
     private checker: ts.TypeChecker;
     private allDeclIds: Array<ts.Identifier>;
+    private moduleResolver: resolver.ModuleResolver;
+
 
     constructor(fileNames: string[]) {
         this.program = ts.createProgram(fileNames, {
@@ -24,9 +29,20 @@ export class ASTTraverse {
         this.allObjects = new defs.RootObject();
 
         this.allDeclIds = new Array<ts.Identifier>();
+
+        this.moduleResolver = new resolver.ModuleResolver();
     }
 
     traverse() {
+
+        for (const sourceFile of this.program.getSourceFiles()) {
+            var self = this;
+            if (self.program.getRootFileNames().indexOf(sourceFile.fileName) != -1) {
+                let fileName: string = path.parse(sourceFile.fileName).name;
+                self.moduleResolver.addModule(fileName, _isExternalModule(sourceFile, self.checker));
+            }
+        };
+
         //firts pass - collecting all defs
         for (const sourceFile of this.program.getSourceFiles()) {
             var self = this;
@@ -51,6 +67,38 @@ export class ASTTraverse {
         };
 
         process.stdout.write(JSON.stringify(this.allObjects));
+
+        function _isExternalModule(sourceFile: ts.SourceFile, checker: ts.TypeChecker) {
+            let res = ts.forEachChild(sourceFile, node => {
+                switch (node.kind) {
+                    case ts.SyntaxKind.ExportAssignment:
+                    case ts.SyntaxKind.ImportDeclaration:
+                        return true;
+                    case ts.SyntaxKind.ImportEqualsDeclaration:
+                        let reference = (<ts.ImportEqualsDeclaration>node).moduleReference;
+                        if (reference.kind === ts.SyntaxKind.ExternalModuleReference) {
+                            return true;
+                        }
+                        break;
+                    //TODO check variable statement here
+                    case ts.SyntaxKind.VariableStatement:
+                    case ts.SyntaxKind.VariableDeclaration:
+                    case ts.SyntaxKind.FunctionDeclaration:
+                    case ts.SyntaxKind.ClassDeclaration:
+                    case ts.SyntaxKind.InterfaceDeclaration:
+                    case ts.SyntaxKind.TypeAliasDeclaration:
+                    case ts.SyntaxKind.EnumDeclaration:
+                    case ts.SyntaxKind.ModuleDeclaration:
+                    case ts.SyntaxKind.ImportDeclaration:
+                        // case ts.SyntaxKind.AmbientDeclaration:
+                        if (self._isExportedNode(node)) {
+                            return true;
+                        }
+                        break;
+                }
+            });
+            return res !== undefined;
+        }
 
         function _collectRefs(node: ts.Node) {
             if (node.kind === ts.SyntaxKind.Identifier) {
@@ -82,12 +130,25 @@ export class ASTTraverse {
 
         function _collectDefs(node: ts.Node) {
             switch (node.kind) {
-                case ts.SyntaxKind.ModuleDeclaration:
+                case ts.SyntaxKind.ModuleDeclaration: {
+                    let decl = <ts.Declaration>node;
+                    self.allDeclIds.push(<ts.Identifier>decl.name);
+                    break;
+                }
                 case ts.SyntaxKind.ClassDeclaration:
                 case ts.SyntaxKind.InterfaceDeclaration:
                 case ts.SyntaxKind.EnumDeclaration:
                 case ts.SyntaxKind.FunctionDeclaration:
                 case ts.SyntaxKind.MethodDeclaration:
+                //TODO - add support for ImportDeclaration
+                // case ts.SyntaxKind.ImportDeclaration: {
+                //     let decl = <ts.ImportDeclaration>node;
+                //     if (decl.importClause !== undefined) {
+                //         let importClause = decl.importClause;
+                //         importClause.name
+                //
+                //     }
+                // }
                 case ts.SyntaxKind.ImportEqualsDeclaration:
                 case ts.SyntaxKind.Parameter:
                 case ts.SyntaxKind.EnumMember:
@@ -154,6 +215,10 @@ export class ASTTraverse {
         return (symbol.flags & ts.SymbolFlags.BlockScoped) != 0;
     }
 
+    private _isExportedNode(node: ts.Node): boolean {
+        return (node.flags & ts.NodeFlags.Export) != 0;
+    }
+
     private _isDeclarationIdentifier(id: ts.Identifier): boolean {
         for (const declId of this.allDeclIds) {
             if (declId.getStart() === id.getStart()
@@ -182,7 +247,8 @@ export class ASTTraverse {
             case ts.SyntaxKind.VariableDeclaration:
                 return fullName ? utils.DefKind.VAR : "var";
             case ts.SyntaxKind.ImportEqualsDeclaration:
-                return fullName ? utils.DefKind.IMPORT_VAR : "var";
+            case ts.SyntaxKind.NamespaceImport:
+                return fullName ? utils.DefKind.IMPORT_VAR : "import_var";
             case ts.SyntaxKind.Parameter:
                 return fullName ? utils.DefKind.PARAM : "param";
             case ts.SyntaxKind.EnumMember:
@@ -213,12 +279,25 @@ export class ASTTraverse {
     }
 
     private _getScopesChain(node: ts.Node, blockedScope: boolean, parentChain: string = ""): string {
-        if (!node || node.kind === ts.SyntaxKind.SourceFile) {
-            return parentChain;
+        if (node.kind === ts.SyntaxKind.SourceFile) {
+            let fileName: string = path.parse(node.getSourceFile().fileName).name;
+            let moduleName: string = this.moduleResolver.getModule(fileName);
+            return (parentChain === "") ? moduleName : moduleName + utils.PATH_SEPARATOR + parentChain;
         }
 
         switch (node.kind) {
-            case ts.SyntaxKind.ModuleDeclaration:
+            case ts.SyntaxKind.ModuleDeclaration: {
+                let decl = <ts.ModuleDeclaration>node;
+                //we found external ambient module here
+                if (decl.name.kind === ts.SyntaxKind.StringLiteral) {
+                    return (parentChain === "") ? this.moduleResolver.formModuleName(decl.name.text) :
+                        this.moduleResolver.formModuleName(decl.name.text) + utils.PATH_SEPARATOR + parentChain;
+                } else {
+                    let name = this._getScopeNameForDeclaration(decl);
+                    let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
+                    return this._getScopesChain(node.parent, blockedScope, newChain);
+                }
+            }
             case ts.SyntaxKind.ClassDeclaration:
             case ts.SyntaxKind.InterfaceDeclaration:
             case ts.SyntaxKind.EnumDeclaration:
