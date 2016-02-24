@@ -19,6 +19,12 @@
     },
     "tsconfig/tsconfig.d.ts": {
       "commit": "2308fd5dd55dc0efd1445fa68310d40cf4b52782"
+    },
+    "q/Q.d.ts": {
+      "commit": "dade4414712ce84e3c63393f1aae407e9e7e6af7"
+    },
+    "async/async.d.ts": {
+      "commit": "dade4414712ce84e3c63393f1aae407e9e7e6af7"
     }
   }
 }

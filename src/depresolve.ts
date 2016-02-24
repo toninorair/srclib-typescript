@@ -24,17 +24,8 @@ export class DepresolveAction implements Action {
                 console.error(err);
                 process.exit(1);
             }
+            console.log(data.Dependencies);
 
-            // TODO: can we live without package.json?
-            readJson('package.json', console.error, function(err, data) {
-                if (err) {
-                    console.error("Unable to read package.json", err);
-                    process.stdout.write('[]');
-                    process.exit(0);
-                }
-                console.log(data);
-
-            });
         }, fd);
     }
 }
