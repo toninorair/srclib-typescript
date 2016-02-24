@@ -2,6 +2,8 @@
 
 import * as fs from "fs";
 import * as ts from "typescript";
+import * as path from "path";
+
 import defs = require('./def-and-ref-template');
 import utils = require('./utils');
 
@@ -11,6 +13,7 @@ export class ASTTraverse {
     private program: ts.Program;
     private checker: ts.TypeChecker;
     private allDeclIds: Array<ts.Identifier>;
+    private items = [];
 
     constructor(fileNames: string[]) {
         this.program = ts.createProgram(fileNames, {
@@ -26,6 +29,22 @@ export class ASTTraverse {
     }
 
     traverse() {
+
+        for (const sourceFile of this.program.getSourceFiles()) {
+
+            var self = this;
+            console.error("MODULE name of SOURCE file", sourceFile.moduleName);
+            if (self.program.getRootFileNames().indexOf(sourceFile.fileName) != -1) {
+                let fileName: string = path.parse(sourceFile.fileName).name;
+                if (_isExternalModule(sourceFile, self.checker)) {
+                    self.items[fileName] = "__mod__" + fileName;
+                } else {
+                    self.items[fileName] = "__mod__global";
+                }
+            }
+        };
+        console.error("ITEMS = ", self.items);
+
         //firts pass - collecting all defs
         for (const sourceFile of this.program.getSourceFiles()) {
             var self = this;
@@ -51,6 +70,38 @@ export class ASTTraverse {
 
         process.stdout.write(JSON.stringify(this.allObjects));
 
+        function _isExternalModule(sourceFile: ts.SourceFile, checker: ts.TypeChecker) {
+            let res = ts.forEachChild(sourceFile, node => {
+                switch (node.kind) {
+                    case ts.SyntaxKind.ExportAssignment:
+                    case ts.SyntaxKind.ImportDeclaration:
+                        return true;
+                    case ts.SyntaxKind.ImportEqualsDeclaration:
+                        let reference = (<ts.ImportEqualsDeclaration>node).moduleReference;
+                        if (reference.kind === ts.SyntaxKind.ExternalModuleReference) {
+                            return true;
+                        }
+                        break;
+                    //TODO check variable statement here
+                    case ts.SyntaxKind.VariableStatement:
+                    case ts.SyntaxKind.VariableDeclaration:
+                    case ts.SyntaxKind.FunctionDeclaration:
+                    case ts.SyntaxKind.ClassDeclaration:
+                    case ts.SyntaxKind.InterfaceDeclaration:
+                    case ts.SyntaxKind.TypeAliasDeclaration:
+                    case ts.SyntaxKind.EnumDeclaration:
+                    case ts.SyntaxKind.ModuleDeclaration:
+                    case ts.SyntaxKind.ImportDeclaration:
+                        // case ts.SyntaxKind.AmbientDeclaration:
+                        if (self._isExportedNode(node)) {
+                            return true;
+                        }
+                        break;
+                }
+            });
+            return res !== undefined;
+        }
+
         function _collectRefs(node: ts.Node) {
             if (node.kind === ts.SyntaxKind.Identifier) {
                 let id = <ts.Identifier>node;
@@ -68,6 +119,12 @@ export class ASTTraverse {
                         for (const decl of symbol.declarations) {
                             if (symbol.declarations.length > 1) {
                                 console.error("DECL for symbol", symbol.name, " = ", decl.getText());
+                            }
+                            console.error("DECL = ", decl.getText(), "SOURCE FILE = ", decl.getSourceFile().fileName);
+                            console.error(path.parse(decl.getSourceFile().fileName).name);
+
+                            if (path.parse(decl.getSourceFile().fileName).ext === ".d.ts") {
+                                console.error("EXTERNAL REPO", decl.getSourceFile().fileName);
                             }
                             self._emitRef(decl, id, self._isBlockedScopeSymbol(symbol));
                         }
@@ -153,6 +210,10 @@ export class ASTTraverse {
         return (symbol.flags & ts.SymbolFlags.BlockScoped) != 0;
     }
 
+    private _isExportedNode(node: ts.Node): boolean {
+        return (node.flags & ts.NodeFlags.Export) != 0;
+    }
+
     private _isDeclarationIdentifier(id: ts.Identifier): boolean {
         for (const declId of this.allDeclIds) {
             if (declId.getStart() === id.getStart()
@@ -212,8 +273,9 @@ export class ASTTraverse {
     }
 
     private _getScopesChain(node: ts.Node, blockedScope: boolean, parentChain: string = ""): string {
-        if (!node || node.kind === ts.SyntaxKind.SourceFile) {
-            return parentChain;
+        if (node.kind === ts.SyntaxKind.SourceFile) {
+            let fileName: string = path.parse(node.getSourceFile().fileName).name;
+            return parentChain + utils.PATH_SEPARATOR + this.items[fileName];
         }
 
         switch (node.kind) {
