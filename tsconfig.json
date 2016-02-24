@@ -14,6 +14,7 @@
     "src/depresolve.ts",
     "src/ast-traverse.ts",
     "src/def-and-ref-template.ts",
-    "src/utils.ts"
+    "src/utils.ts",
+    "src/module-resolver.ts"
   ]
 }
