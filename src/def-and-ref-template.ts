@@ -18,6 +18,7 @@ export class Def {
 
 export class Ref {
     DefPath: string;
+    Def: boolean;
     File: string;
     Start: number;
     End: number;

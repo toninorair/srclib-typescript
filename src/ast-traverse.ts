@@ -37,6 +37,7 @@ export class ASTTraverse {
         for (const sourceFile of this.program.getSourceFiles()) {
             var self = this;
             if (!sourceFile.hasNoDefaultLib) {
+                console.error("SRC file = ", sourceFile.fileName);
                 //if (self.program.getRootFileNames().indexOf(sourceFile.fileName) != -1) {
                 let fileName: string = path.parse(sourceFile.fileName).name;
                 self.moduleResolver.addModule(fileName, _isExternalModule(sourceFile, self.checker));
@@ -118,7 +119,6 @@ export class ASTTraverse {
                             if (symbol.declarations.length > 1) {
                                 console.error("DECL for symbol", symbol.name, " = ", decl.getText());
                             }
-
                             self._emitRef(decl, id, self._isBlockedScopeSymbol(symbol));
                         }
                     } else {
@@ -194,12 +194,15 @@ export class ASTTraverse {
         def.DefStart = id.getStart();
         def.DefEnd = id.getEnd();
         this.allObjects.Defs.push(def);
-        // console.error(JSON.stringify(def));
-        // console.error("-------------------");
+
+        //emit special ref with Def field set into true
+        this._emitRef(decl, id, blockedScope, true);
+        console.error(JSON.stringify(def));
+        console.error("-------------------");
     }
 
     //now declaration is provided as node here
-    private _emitRef(decl: ts.Declaration, id: ts.Identifier, blockedScope: boolean = false) {
+    private _emitRef(decl: ts.Declaration, id: ts.Identifier, blockedScope: boolean = false, definitionRef: boolean = false) {
         //emitting ref here
         var ref: defs.Ref = new defs.Ref();
         var scopeRes: string = this._getScopesChain(decl.parent, blockedScope);
@@ -209,9 +212,13 @@ export class ASTTraverse {
         ref.Start = id.getStart();
         ref.End = id.getEnd();
         ref.End = id.getEnd();
+        //optional field, set only for definition refs
+        if (definitionRef) {
+            ref.Def = true;
+        }
         this.allObjects.Refs.push(ref);
-        // console.error(JSON.stringify(ref));
-        // console.error("-------------------");
+        console.error(JSON.stringify(ref));
+        console.error("-------------------");
     }
 
     private _isBlockedScopeSymbol(symbol: ts.Symbol): boolean {
