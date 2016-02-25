@@ -1,4 +1,3 @@
-//// <reference path="def-and-ref-template.ts" />
 //// <reference path="../typings/typescript/typescript.d.ts" />
 
 import * as fs from "fs";
