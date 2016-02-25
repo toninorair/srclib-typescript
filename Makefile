@@ -7,7 +7,7 @@ default: install-dep install
 
 install: .bin/srclib-typescript.js
 
-.bin/srclib-typescript.js: node_modules ${SRC} tsconfig.json tsd.json package.json
+.bin/srclib-typescript.js: node_modules ${SRC} tsconfig.json package.json
 	tsc -p .
 
 install-dep:
