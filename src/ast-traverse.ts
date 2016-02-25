@@ -37,7 +37,7 @@ export class ASTTraverse {
         for (const sourceFile of this.program.getSourceFiles()) {
             var self = this;
             if (!sourceFile.hasNoDefaultLib) {
-                console.error("SRC file = ", sourceFile.fileName);
+                //console.error("SRC file = ", sourceFile.fileName);
                 //if (self.program.getRootFileNames().indexOf(sourceFile.fileName) != -1) {
                 let fileName: string = path.parse(sourceFile.fileName).name;
                 self.moduleResolver.addModule(fileName, _isExternalModule(sourceFile, self.checker));

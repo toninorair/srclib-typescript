@@ -26,7 +26,3 @@ export function formPath(scope: string, element, addToTheEnd: boolean = false): 
         return (scope === "") ? element : element + PATH_SEPARATOR + scope;
     }
 }
-
-// export function formPathReverse(scope: string, element): string {
-//     return (scope === "") ? element : element + PATH_SEPARATOR + scope;
-// }
