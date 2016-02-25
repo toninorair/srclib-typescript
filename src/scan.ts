@@ -33,6 +33,7 @@ export class ScanAction implements Action {
           var deps = [];
           repos.forEach(function(repo:any) {
             deps.push({
+              Raw: repo,
               Target: {
                 ToRepoCloneURL: repo.uri,
                 ToUnit: 'TODO',
@@ -51,7 +52,7 @@ export class ScanAction implements Action {
           var packageJson: any;
           try {
             var json = fs.readFileSync('package.json');
-            packageJson = JSON.parse(json);
+            packageJson = JSON.parse(json.toString());
           } catch (e) {
              packageJson = {};
           }
@@ -108,10 +109,10 @@ export class ScanAction implements Action {
       var tasks = [];
       async.forEachOf(deps.dependencies || {}, function(v:any, k:string) {
         tasks.push(function(callback) {
+          delete v.dependencies;
           npm.commands.view([k + '@' + v.version], true, function(err, data) {
-            callback(err, {
-                uri: ((data[v.version] || {}).repository || {}).url,
-                version: v.version});
+            v.uri = ((data[v.version] || {}).repository || {}).url;
+            callback(err, v);
           })
         });
       }, function() {});
