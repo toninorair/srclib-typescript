@@ -1,4 +1,4 @@
-//// <reference path="../typings/typescript/typescript.d.ts" />
+/// <reference path="../typings/typescript/typescript.d.ts" />
 
 import * as fs from "fs";
 import * as ts from "typescript";
@@ -188,7 +188,8 @@ export class ASTTraverse {
         //def.Path = this.checker.getFullyQualifiedName(symbol);
         var scopeRes: string = this._getScopesChain(decl.parent, blockedScope);
         var declNameInScope: string = this._getScopeNameForDeclaration(decl);
-        def.Path = (scopeRes === "") ? declNameInScope : scopeRes + utils.PATH_SEPARATOR + declNameInScope;
+        def.Path = utils.formPath(scopeRes, declNameInScope, true);
+        def.TreePath = def.Path;
         def.Kind = this._getDeclarationKindName(decl.kind, true);
         def.File = decl.getSourceFile().fileName;
         def.DefStart = id.getStart();
@@ -207,7 +208,7 @@ export class ASTTraverse {
         var ref: defs.Ref = new defs.Ref();
         var scopeRes: string = this._getScopesChain(decl.parent, blockedScope);
         var declNameInScope: string = this._getScopeNameForDeclaration(decl);
-        ref.DefPath = (scopeRes === "") ? declNameInScope : scopeRes + utils.PATH_SEPARATOR + declNameInScope;
+        ref.DefPath = utils.formPath(scopeRes, declNameInScope, true);
         ref.File = id.getSourceFile().fileName;
         ref.Start = id.getStart();
         ref.End = id.getEnd();
@@ -292,7 +293,7 @@ export class ASTTraverse {
         if (node.kind === ts.SyntaxKind.SourceFile) {
             let fileName: string = path.parse(node.getSourceFile().fileName).name;
             let moduleName: string = this.moduleResolver.getModule(fileName);
-            return (parentChain === "") ? moduleName : moduleName + utils.PATH_SEPARATOR + parentChain;
+            return utils.formPath(parentChain, moduleName);
         }
 
         switch (node.kind) {
@@ -300,11 +301,10 @@ export class ASTTraverse {
                 let decl = <ts.ModuleDeclaration>node;
                 //we found external ambient module here
                 if (decl.name.kind === ts.SyntaxKind.StringLiteral) {
-                    return (parentChain === "") ? this.moduleResolver.formModuleName(decl.name.text) :
-                        this.moduleResolver.formModuleName(decl.name.text) + utils.PATH_SEPARATOR + parentChain;
+                    return utils.formPath(parentChain, this.moduleResolver.formModuleName(decl.name.text));
                 } else {
                     let name = this._getScopeNameForDeclaration(decl);
-                    let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
+                    let newChain = utils.formPath(parentChain, name);
                     return this._getScopesChain(node.parent, blockedScope, newChain);
                 }
             }
@@ -317,7 +317,7 @@ export class ASTTraverse {
             case ts.SyntaxKind.MethodSignature: {
                 let decl = <ts.Declaration>node;
                 let name = this._getScopeNameForDeclaration(decl);
-                let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
+                let newChain = utils.formPath(parentChain, name);
                 return this._getScopesChain(node.parent, blockedScope, newChain);
             }
 
@@ -326,13 +326,13 @@ export class ASTTraverse {
                 let decl = <ts.VariableDeclaration>node;
                 //TODO temporary decision - find better one
                 let name = "interface" + "__" + decl.type.getText();
-                let newChain = (parentChain === "") ? name : name + utils.PATH_SEPARATOR + parentChain;
+                let newChain = utils.formPath(parentChain, name);
                 return this._getScopesChain(node.parent, blockedScope, newChain);
             }
             case ts.SyntaxKind.Block: {
                 if (blockedScope) {
                     let decl = <ts.Block>node;
-                    let newChain: string = (parentChain === "") ? "" + decl.getStart() : decl.getStart() + utils.PATH_SEPARATOR + parentChain;
+                    let newChain = utils.formPath(parentChain, decl.getStart());
                     return this._getScopesChain(node.parent, blockedScope, newChain);
                 }
             }

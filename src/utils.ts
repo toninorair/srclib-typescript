@@ -18,3 +18,15 @@ export function formFnSignatureForPath(sig: string): string {
 }
 
 export var PATH_SEPARATOR: string = ".";
+
+export function formPath(scope: string, element, addToTheEnd: boolean = false): string {
+    if (addToTheEnd) {
+        return (scope === "") ? element : scope + PATH_SEPARATOR + element;
+    } else {
+        return (scope === "") ? element : element + PATH_SEPARATOR + scope;
+    }
+}
+
+// export function formPathReverse(scope: string, element): string {
+//     return (scope === "") ? element : element + PATH_SEPARATOR + scope;
+// }
