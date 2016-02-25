@@ -37,7 +37,7 @@ export class ASTTraverse {
         for (const sourceFile of this.program.getSourceFiles()) {
             var self = this;
             if (!sourceFile.hasNoDefaultLib) {
-                //console.error("SRC file = ", sourceFile.fileName);
+                console.error("SRC file = ", sourceFile.fileName);
                 //if (self.program.getRootFileNames().indexOf(sourceFile.fileName) != -1) {
                 let fileName: string = path.parse(sourceFile.fileName).name;
                 self.moduleResolver.addModule(fileName, _isExternalModule(sourceFile, self.checker));
@@ -50,6 +50,7 @@ export class ASTTraverse {
 
             //check whether it is actual source file for analysis
             if (!sourceFile.hasNoDefaultLib) {
+                console.error("DEFS for file = ", sourceFile.fileName);
                 //if (self.program.getRootFileNames().indexOf(sourceFile.fileName) != -1) {
                 // Walk the ast tree to search for defs
                 ts.forEachChild(sourceFile, _collectDefs);
@@ -280,10 +281,17 @@ export class ASTTraverse {
         switch (decl.kind) {
             //TODO change names of method, using type from typechecker
             case ts.SyntaxKind.MethodSignature:
+            case ts.SyntaxKind.MethodDeclaration:
                 return this._getDeclarationKindName(decl.kind) + "__" + utils.formFnSignatureForPath(decl.getText());
             //TODO check if it's the best decision
             case ts.SyntaxKind.PropertyAssignment:
                 return "property_sig" + "__" + (<ts.Identifier>decl.name).text;
+
+            case ts.SyntaxKind.InterfaceDeclaration:
+            case ts.SyntaxKind.VariableDeclaration:
+            case ts.SyntaxKind.Parameter:
+            case ts.SyntaxKind.FunctionDeclaration:
+                return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text + decl.getStart();
             default:
                 return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text;
         }
