@@ -1,5 +1,5 @@
-/// <reference path="def-and-ref-template.ts" />
-/// <reference path="../typings/typescript/typescript.d.ts" />
+//// <reference path="def-and-ref-template.ts" />
+//// <reference path="../typings/typescript/typescript.d.ts" />
 
 import * as fs from "fs";
 import * as ts from "typescript";
@@ -37,7 +37,8 @@ export class ASTTraverse {
 
         for (const sourceFile of this.program.getSourceFiles()) {
             var self = this;
-            if (self.program.getRootFileNames().indexOf(sourceFile.fileName) != -1) {
+            if (!sourceFile.hasNoDefaultLib) {
+                //if (self.program.getRootFileNames().indexOf(sourceFile.fileName) != -1) {
                 let fileName: string = path.parse(sourceFile.fileName).name;
                 self.moduleResolver.addModule(fileName, _isExternalModule(sourceFile, self.checker));
             }
@@ -48,19 +49,19 @@ export class ASTTraverse {
             var self = this;
 
             //check whether it is actual source file for analysis
-            //if (!sourceFile.hasNoDefaultLib) {
-            if (self.program.getRootFileNames().indexOf(sourceFile.fileName) != -1) {
+            if (!sourceFile.hasNoDefaultLib) {
+                //if (self.program.getRootFileNames().indexOf(sourceFile.fileName) != -1) {
                 // Walk the ast tree to search for defs
                 ts.forEachChild(sourceFile, _collectDefs);
             }
         };
 
-        //second pass - collecting all refs
+        // //second pass - collecting all refs
         for (const sourceFile of this.program.getSourceFiles()) {
             var self = this;
             //check whether it is actual source file for analysis
-            //if (!sourceFile.hasNoDefaultLib) {
-            if (self.program.getRootFileNames().indexOf(sourceFile.fileName) != -1) {
+            if (!sourceFile.hasNoDefaultLib) {
+                //if (self.program.getRootFileNames().indexOf(sourceFile.fileName) != -1) {
                 // Walk the ast tree to search for refs
                 ts.forEachChild(sourceFile, _collectRefs);
             }
@@ -118,6 +119,7 @@ export class ASTTraverse {
                             if (symbol.declarations.length > 1) {
                                 console.error("DECL for symbol", symbol.name, " = ", decl.getText());
                             }
+
                             self._emitRef(decl, id, self._isBlockedScopeSymbol(symbol));
                         }
                     } else {
@@ -177,6 +179,8 @@ export class ASTTraverse {
         }
     }
 
+
+
     private _emitDef(decl: ts.Declaration, blockedScope: boolean = false) {
         //emitting def here
         var def: defs.Def = new defs.Def();
@@ -191,8 +195,8 @@ export class ASTTraverse {
         def.DefStart = id.getStart();
         def.DefEnd = id.getEnd();
         this.allObjects.Defs.push(def);
-        console.error(JSON.stringify(def));
-        console.error("-------------------");
+        // console.error(JSON.stringify(def));
+        // console.error("-------------------");
     }
 
     //now declaration is provided as node here
@@ -207,8 +211,8 @@ export class ASTTraverse {
         ref.End = id.getEnd();
         ref.End = id.getEnd();
         this.allObjects.Refs.push(ref);
-        console.error(JSON.stringify(ref));
-        console.error("-------------------");
+        // console.error(JSON.stringify(ref));
+        // console.error("-------------------");
     }
 
     private _isBlockedScopeSymbol(symbol: ts.Symbol): boolean {
@@ -331,3 +335,18 @@ export class ASTTraverse {
         }
     }
 }
+
+// private _isExternalDeclaration(node: ts.Node, decl: ts.Declaration) {
+//     let nodeFile: string = node.getSourceFile().fileName;
+//     let declFile: string = decl.getSourceFile().fileName;
+//     if (nodeFile === declFile) {
+//         return false;
+//     }
+//
+//     for (const sourceFile of this.program.getRootFileNames()) {
+//         if (sourceFile === declFile) {
+//             return false;
+//         }
+//     }
+//     return true;
+// }
