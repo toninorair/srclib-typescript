@@ -1,10 +1,10 @@
 [ { Raw: 
-     { from: 'typescript@1.7.5',
-       resolved: 'https://registry.npmjs.org/typescript/-/typescript-1.7.5.tgz',
+     { from: 'typescript@>=1.8.2 <2.0.0',
+       resolved: 'https://registry.npmjs.org/typescript/-/typescript-1.8.2.tgz',
        uri: 'https://github.com/Microsoft/TypeScript.git',
-       version: '1.7.5' },
+       version: '1.8.2' },
     Target: 
      { ToRepoCloneURL: 'https://github.com/Microsoft/TypeScript.git',
        ToUnit: 'TODO',
        ToUnitType: 'CommonJSPackage',
-       ToVersionString: '1.7.5' } } ]
+       ToVersionString: '1.8.2' } } ]
