@@ -1,0 +1,70 @@
+[ { Raw: 
+     { from: 'async@>=1.5.2 <2.0.0',
+       resolved: 'https://registry.npmjs.org/async/-/async-1.5.2.tgz',
+       uri: 'git+https://github.com/caolan/async.git',
+       version: '1.5.2' },
+    Target: 
+     { ToRepoCloneURL: 'git+https://github.com/caolan/async.git',
+       ToUnit: 'TODO',
+       ToUnitType: 'CommonJSPackage',
+       ToVersionString: '1.5.2' } },
+  { Raw: 
+     { from: 'commander@2.3.0',
+       resolved: 'https://registry.npmjs.org/commander/-/commander-2.3.0.tgz',
+       uri: 'https://github.com/visionmedia/commander.js.git',
+       version: '2.3.0' },
+    Target: 
+     { ToRepoCloneURL: 'https://github.com/visionmedia/commander.js.git',
+       ToUnit: 'TODO',
+       ToUnitType: 'CommonJSPackage',
+       ToVersionString: '2.3.0' } },
+  { Raw: 
+     { from: 'npm@2.0.0',
+       resolved: 'https://registry.npmjs.org/npm/-/npm-2.0.0.tgz',
+       uri: 'https://github.com/npm/npm',
+       version: '2.0.0' },
+    Target: 
+     { ToRepoCloneURL: 'https://github.com/npm/npm',
+       ToUnit: 'TODO',
+       ToUnitType: 'CommonJSPackage',
+       ToVersionString: '2.0.0' } },
+  { Raw: 
+     { from: 'q@1.4.1',
+       resolved: 'https://registry.npmjs.org/q/-/q-1.4.1.tgz',
+       uri: 'git://github.com/kriskowal/q.git',
+       version: '1.4.1' },
+    Target: 
+     { ToRepoCloneURL: 'git://github.com/kriskowal/q.git',
+       ToUnit: 'TODO',
+       ToUnitType: 'CommonJSPackage',
+       ToVersionString: '1.4.1' } },
+  { Raw: 
+     { from: 'read-package-json@2.0.3',
+       resolved: 'https://registry.npmjs.org/read-package-json/-/read-package-json-2.0.3.tgz',
+       uri: 'git+https://github.com/npm/read-package-json.git',
+       version: '2.0.3' },
+    Target: 
+     { ToRepoCloneURL: 'git+https://github.com/npm/read-package-json.git',
+       ToUnit: 'TODO',
+       ToUnitType: 'CommonJSPackage',
+       ToVersionString: '2.0.3' } },
+  { Raw: 
+     { from: 'tsconfig@2.2.0',
+       resolved: 'https://registry.npmjs.org/tsconfig/-/tsconfig-2.2.0.tgz',
+       uri: 'https://github.com/TypeStrong/tsconfig.git',
+       version: '2.2.0' },
+    Target: 
+     { ToRepoCloneURL: 'https://github.com/TypeStrong/tsconfig.git',
+       ToUnit: 'TODO',
+       ToUnitType: 'CommonJSPackage',
+       ToVersionString: '2.2.0' } },
+  { Raw: 
+     { from: 'typescript@>=1.8.2 <2.0.0',
+       resolved: 'https://registry.npmjs.org/typescript/-/typescript-1.8.2.tgz',
+       uri: 'https://github.com/Microsoft/TypeScript.git',
+       version: '1.8.2' },
+    Target: 
+     { ToRepoCloneURL: 'https://github.com/Microsoft/TypeScript.git',
+       ToUnit: 'TODO',
+       ToUnitType: 'CommonJSPackage',
+       ToVersionString: '1.8.2' } } ]
