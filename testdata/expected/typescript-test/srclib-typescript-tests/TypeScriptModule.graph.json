@@ -1,0 +1,830 @@
+{
+  "Defs": [
+    {
+      "Path": "__MOD__global.interface__Foo1.method__bar(s_string)_string { return \"1\" }",
+      "Name": "bar",
+      "Kind": "method",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-interfaces/interface.ts",
+      "DefStart": 120,
+      "DefEnd": 123,
+      "TreePath": "__MOD__global.interface__Foo1.method__bar(s_string)_string { return \"1\" }"
+    },
+    {
+      "Path": "__MOD__global.interface__Foo1.method__bar(s_string)_string { return \"1\" }.param__s124",
+      "Name": "s",
+      "Kind": "param",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-interfaces/interface.ts",
+      "DefStart": 124,
+      "DefEnd": 125,
+      "TreePath": "__MOD__global.interface__Foo1.method__bar(s_string)_string { return \"1\" }.param__s124"
+    },
+    {
+      "Path": "__MOD__global.interface__Foo10",
+      "Name": "Foo1",
+      "Kind": "interface",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-interfaces/interface.ts",
+      "DefStart": 10,
+      "DefEnd": 14,
+      "TreePath": "__MOD__global.interface__Foo10"
+    },
+    {
+      "Path": "__MOD__global.interface__Foo10.property_sig__bar",
+      "Name": "bar",
+      "Kind": "property signature",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-interfaces/interface.ts",
+      "DefStart": 21,
+      "DefEnd": 24,
+      "TreePath": "__MOD__global.interface__Foo10.property_sig__bar"
+    },
+    {
+      "Path": "__MOD__global.interface__Foo10.property_sig__bar.param__s37",
+      "Name": "s",
+      "Kind": "param",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-interfaces/interface.ts",
+      "DefStart": 37,
+      "DefEnd": 38,
+      "TreePath": "__MOD__global.interface__Foo10.property_sig__bar.param__s37"
+    },
+    {
+      "Path": "__MOD__global.interface__Foo162",
+      "Name": "Foo",
+      "Kind": "interface",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-interfaces/interface.ts",
+      "DefStart": 172,
+      "DefEnd": 175,
+      "TreePath": "__MOD__global.interface__Foo162"
+    },
+    {
+      "Path": "__MOD__global.interface__Foo162.property_sig__name1",
+      "Name": "name1",
+      "Kind": "property signature",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-interfaces/interface.ts",
+      "DefStart": 182,
+      "DefEnd": 187,
+      "TreePath": "__MOD__global.interface__Foo162.property_sig__name1"
+    },
+    {
+      "Path": "__MOD__global.module__test1.enum__Color",
+      "Name": "Color",
+      "Kind": "enum",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/enum.ts",
+      "DefStart": 27,
+      "DefEnd": 32,
+      "TreePath": "__MOD__global.module__test1.enum__Color"
+    },
+    {
+      "Path": "__MOD__global.module__test1.enum__Color.enum_val__Blue",
+      "Name": "Blue",
+      "Kind": "enum member",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/enum.ts",
+      "DefStart": 47,
+      "DefEnd": 51,
+      "TreePath": "__MOD__global.module__test1.enum__Color.enum_val__Blue"
+    },
+    {
+      "Path": "__MOD__global.module__test1.enum__Color.enum_val__Green",
+      "Name": "Green",
+      "Kind": "enum member",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/enum.ts",
+      "DefStart": 40,
+      "DefEnd": 45,
+      "TreePath": "__MOD__global.module__test1.enum__Color.enum_val__Green"
+    },
+    {
+      "Path": "__MOD__global.module__test1.enum__Color.enum_val__Red",
+      "Name": "Red",
+      "Kind": "enum member",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/enum.ts",
+      "DefStart": 35,
+      "DefEnd": 38,
+      "TreePath": "__MOD__global.module__test1.enum__Color.enum_val__Red"
+    },
+    {
+      "Path": "__MOD__global.module__test1.var__c63",
+      "Name": "c",
+      "Kind": "var",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/enum.ts",
+      "DefStart": 63,
+      "DefEnd": 64,
+      "TreePath": "__MOD__global.module__test1.var__c63"
+    },
+    {
+      "Path": "__MOD__global.module__test2.class__C1",
+      "Name": "C1",
+      "Kind": "class",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/simple-vars-and-classes.ts",
+      "DefStart": 86,
+      "DefEnd": 88,
+      "TreePath": "__MOD__global.module__test2.class__C1"
+    },
+    {
+      "Path": "__MOD__global.module__test2.class__C1.field__x",
+      "Name": "x",
+      "Kind": "property",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/simple-vars-and-classes.ts",
+      "DefStart": 99,
+      "DefEnd": 100,
+      "TreePath": "__MOD__global.module__test2.class__C1.field__x"
+    },
+    {
+      "Path": "__MOD__global.module__test2.class__C1.field__z",
+      "Name": "z",
+      "Kind": "property",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/simple-vars-and-classes.ts",
+      "DefStart": 119,
+      "DefEnd": 120,
+      "TreePath": "__MOD__global.module__test2.class__C1.field__z"
+    },
+    {
+      "Path": "__MOD__global.module__test2.class__C1.field__z1",
+      "Name": "z1",
+      "Kind": "property",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/simple-vars-and-classes.ts",
+      "DefStart": 146,
+      "DefEnd": 148,
+      "TreePath": "__MOD__global.module__test2.class__C1.field__z1"
+    },
+    {
+      "Path": "__MOD__global.module__test2.var__a26",
+      "Name": "a",
+      "Kind": "var",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/simple-vars-and-classes.ts",
+      "DefStart": 26,
+      "DefEnd": 27,
+      "TreePath": "__MOD__global.module__test2.var__a26"
+    },
+    {
+      "Path": "__MOD__global.module__test2.var__b45",
+      "Name": "b",
+      "Kind": "var",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/simple-vars-and-classes.ts",
+      "DefStart": 45,
+      "DefEnd": 46,
+      "TreePath": "__MOD__global.module__test2.var__b45"
+    },
+    {
+      "Path": "__MOD__global.module__test2.var__x64",
+      "Name": "x",
+      "Kind": "var",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/simple-vars-and-classes.ts",
+      "DefStart": 64,
+      "DefEnd": 65,
+      "TreePath": "__MOD__global.module__test2.var__x64"
+    },
+    {
+      "Path": "__MOD__global.module__test3.class__C1",
+      "Name": "C1",
+      "Kind": "class",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-classes.ts",
+      "DefStart": 28,
+      "DefEnd": 30,
+      "TreePath": "__MOD__global.module__test3.class__C1"
+    },
+    {
+      "Path": "__MOD__global.module__test3.class__C1.field__c",
+      "Name": "c",
+      "Kind": "property",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-classes.ts",
+      "DefStart": 48,
+      "DefEnd": 49,
+      "TreePath": "__MOD__global.module__test3.class__C1.field__c"
+    },
+    {
+      "Path": "__MOD__global.module__test3.class__C1.field__x",
+      "Name": "x",
+      "Kind": "property",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-classes.ts",
+      "DefStart": 67,
+      "DefEnd": 68,
+      "TreePath": "__MOD__global.module__test3.class__C1.field__x"
+    },
+    {
+      "Path": "__MOD__global.module__test3.class__C1.field__y",
+      "Name": "y",
+      "Kind": "property",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-classes.ts",
+      "DefStart": 86,
+      "DefEnd": 87,
+      "TreePath": "__MOD__global.module__test3.class__C1.field__y"
+    },
+    {
+      "Path": "__MOD__global.module__test3.class__C1.field__z",
+      "Name": "z",
+      "Kind": "property",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-classes.ts",
+      "DefStart": 105,
+      "DefEnd": 106,
+      "TreePath": "__MOD__global.module__test3.class__C1.field__z"
+    },
+    {
+      "Path": "__MOD__global.module__test3.var__c1_inst156",
+      "Name": "c1_inst",
+      "Kind": "var",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-classes.ts",
+      "DefStart": 156,
+      "DefEnd": 163,
+      "TreePath": "__MOD__global.module__test3.var__c1_inst156"
+    },
+    {
+      "Path": "__MOD__global.module__test4.func__f122",
+      "Name": "f1",
+      "Kind": "function",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-let.ts",
+      "DefStart": 31,
+      "DefEnd": 33,
+      "TreePath": "__MOD__global.module__test4.func__f122"
+    },
+    {
+      "Path": "__MOD__global.module__test4.func__f122.36.132.var__x150",
+      "Name": "x",
+      "Kind": "var",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-let.ts",
+      "DefStart": 150,
+      "DefEnd": 151,
+      "TreePath": "__MOD__global.module__test4.func__f122.36.132.var__x150"
+    },
+    {
+      "Path": "__MOD__global.module__test4.func__f122.36.58.var__x95",
+      "Name": "x",
+      "Kind": "var",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-let.ts",
+      "DefStart": 95,
+      "DefEnd": 96,
+      "TreePath": "__MOD__global.module__test4.func__f122.36.58.var__x95"
+    },
+    {
+      "Path": "__MOD__global.module__test4.func__f122.var__x76",
+      "Name": "x",
+      "Kind": "var",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-let.ts",
+      "DefStart": 76,
+      "DefEnd": 77,
+      "TreePath": "__MOD__global.module__test4.func__f122.var__x76"
+    },
+    {
+      "Path": "__MOD__global.module__test5.class__C1",
+      "Name": "C1",
+      "Kind": "class",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/vars-and-classes-test.ts",
+      "DefStart": 28,
+      "DefEnd": 30,
+      "TreePath": "__MOD__global.module__test5.class__C1"
+    },
+    {
+      "Path": "__MOD__global.module__test5.class__C1.field__a",
+      "Name": "a",
+      "Kind": "property",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/vars-and-classes-test.ts",
+      "DefStart": 41,
+      "DefEnd": 42,
+      "TreePath": "__MOD__global.module__test5.class__C1.field__a"
+    },
+    {
+      "Path": "__MOD__global.module__test5.class__C1.method__f2(x_string, y_number) {\n            var z_string\n            x + y + z + this.a;\n\n        }",
+      "Name": "f2",
+      "Kind": "method",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/vars-and-classes-test.ts",
+      "DefStart": 60,
+      "DefEnd": 62,
+      "TreePath": "__MOD__global.module__test5.class__C1.method__f2(x_string, y_number) {\n            var z_string\n            x + y + z + this.a;\n\n        }"
+    },
+    {
+      "Path": "__MOD__global.module__test5.class__C1.method__f2(x_string, y_number) {\n            var z_string\n            x + y + z + this.a;\n\n        }.param__x63",
+      "Name": "x",
+      "Kind": "param",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/vars-and-classes-test.ts",
+      "DefStart": 63,
+      "DefEnd": 64,
+      "TreePath": "__MOD__global.module__test5.class__C1.method__f2(x_string, y_number) {\n            var z_string\n            x + y + z + this.a;\n\n        }.param__x63"
+    },
+    {
+      "Path": "__MOD__global.module__test5.class__C1.method__f2(x_string, y_number) {\n            var z_string\n            x + y + z + this.a;\n\n        }.param__y74",
+      "Name": "y",
+      "Kind": "param",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/vars-and-classes-test.ts",
+      "DefStart": 74,
+      "DefEnd": 75,
+      "TreePath": "__MOD__global.module__test5.class__C1.method__f2(x_string, y_number) {\n            var z_string\n            x + y + z + this.a;\n\n        }.param__y74"
+    },
+    {
+      "Path": "__MOD__global.module__test5.class__C1.method__f2(x_string, y_number) {\n            var z_string\n            x + y + z + this.a;\n\n        }.var__z103",
+      "Name": "z",
+      "Kind": "var",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/vars-and-classes-test.ts",
+      "DefStart": 103,
+      "DefEnd": 104,
+      "TreePath": "__MOD__global.module__test5.class__C1.method__f2(x_string, y_number) {\n            var z_string\n            x + y + z + this.a;\n\n        }.var__z103"
+    },
+    {
+      "Path": "__MOD__global.module__test5.var__c_inst3172",
+      "Name": "c_inst3",
+      "Kind": "var",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/vars-and-classes-test.ts",
+      "DefStart": 172,
+      "DefEnd": 179,
+      "TreePath": "__MOD__global.module__test5.var__c_inst3172"
+    },
+    {
+      "Path": "__MOD__global.var__foo1204",
+      "Name": "foo1",
+      "Kind": "var",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-interfaces/interface.ts",
+      "DefStart": 204,
+      "DefEnd": 208,
+      "TreePath": "__MOD__global.var__foo1204"
+    },
+    {
+      "Path": "__MOD__global.var__foo_inst101",
+      "Name": "foo_inst",
+      "Kind": "var",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-interfaces/interface.ts",
+      "DefStart": 101,
+      "DefEnd": 109,
+      "TreePath": "__MOD__global.var__foo_inst101"
+    }
+  ],
+  "Refs": [
+    {
+      "DefPath": "__MOD__global.interface__Foo.property_sig__name1",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-interfaces/interface.ts",
+      "Start": 218,
+      "End": 223
+    },
+    {
+      "DefPath": "__MOD__global.interface__Foo1.method__bar(s_string)_string { return \"1\" }.param__s124",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-interfaces/interface.ts",
+      "Start": 124,
+      "End": 125
+    },
+    {
+      "DefPath": "__MOD__global.interface__Foo1.method__bar(s_string)_string { return \"1\" }",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-interfaces/interface.ts",
+      "Start": 120,
+      "End": 123
+    },
+    {
+      "DefPath": "__MOD__global.interface__Foo10.property_sig__bar.param__s37",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-interfaces/interface.ts",
+      "Start": 37,
+      "End": 38
+    },
+    {
+      "DefPath": "__MOD__global.interface__Foo10.property_sig__bar",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-interfaces/interface.ts",
+      "Start": 21,
+      "End": 24
+    },
+    {
+      "DefPath": "__MOD__global.interface__Foo10",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-interfaces/interface.ts",
+      "Start": 10,
+      "End": 14
+    },
+    {
+      "DefPath": "__MOD__global.interface__Foo10",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-interfaces/interface.ts",
+      "Start": 111,
+      "End": 115
+    },
+    {
+      "DefPath": "__MOD__global.interface__Foo162.property_sig__name1",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-interfaces/interface.ts",
+      "Start": 182,
+      "End": 187
+    },
+    {
+      "DefPath": "__MOD__global.interface__Foo162.property_sig__name1",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-interfaces/interface.ts",
+      "Start": 238,
+      "End": 243
+    },
+    {
+      "DefPath": "__MOD__global.interface__Foo162",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-interfaces/interface.ts",
+      "Start": 172,
+      "End": 175
+    },
+    {
+      "DefPath": "__MOD__global.interface__Foo162",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-interfaces/interface.ts",
+      "Start": 210,
+      "End": 213
+    },
+    {
+      "DefPath": "__MOD__global.module__test1.enum__Color.enum_val__Blue",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/enum.ts",
+      "Start": 47,
+      "End": 51
+    },
+    {
+      "DefPath": "__MOD__global.module__test1.enum__Color.enum_val__Green",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/enum.ts",
+      "Start": 40,
+      "End": 45
+    },
+    {
+      "DefPath": "__MOD__global.module__test1.enum__Color.enum_val__Green",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/enum.ts",
+      "Start": 80,
+      "End": 85
+    },
+    {
+      "DefPath": "__MOD__global.module__test1.enum__Color.enum_val__Red",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/enum.ts",
+      "Start": 35,
+      "End": 38
+    },
+    {
+      "DefPath": "__MOD__global.module__test1.enum__Color",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/enum.ts",
+      "Start": 27,
+      "End": 32
+    },
+    {
+      "DefPath": "__MOD__global.module__test1.enum__Color",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/enum.ts",
+      "Start": 66,
+      "End": 71
+    },
+    {
+      "DefPath": "__MOD__global.module__test1.enum__Color",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/enum.ts",
+      "Start": 74,
+      "End": 79
+    },
+    {
+      "DefPath": "__MOD__global.module__test1.var__c63",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/enum.ts",
+      "Start": 63,
+      "End": 64
+    },
+    {
+      "DefPath": "__MOD__global.module__test2.class__C1.field__x",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/simple-vars-and-classes.ts",
+      "Start": 164,
+      "End": 165
+    },
+    {
+      "DefPath": "__MOD__global.module__test2.class__C1.field__x",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/simple-vars-and-classes.ts",
+      "Start": 99,
+      "End": 100
+    },
+    {
+      "DefPath": "__MOD__global.module__test2.class__C1.field__z",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/simple-vars-and-classes.ts",
+      "Start": 119,
+      "End": 120
+    },
+    {
+      "DefPath": "__MOD__global.module__test2.class__C1.field__z1",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/simple-vars-and-classes.ts",
+      "Start": 146,
+      "End": 148
+    },
+    {
+      "DefPath": "__MOD__global.module__test2.class__C1",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/simple-vars-and-classes.ts",
+      "Start": 86,
+      "End": 88
+    },
+    {
+      "DefPath": "__MOD__global.module__test2.var__a26",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/simple-vars-and-classes.ts",
+      "Start": 131,
+      "End": 132
+    },
+    {
+      "DefPath": "__MOD__global.module__test2.var__a26",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/simple-vars-and-classes.ts",
+      "Start": 26,
+      "End": 27
+    },
+    {
+      "DefPath": "__MOD__global.module__test2.var__b45",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/simple-vars-and-classes.ts",
+      "Start": 135,
+      "End": 136
+    },
+    {
+      "DefPath": "__MOD__global.module__test2.var__b45",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/simple-vars-and-classes.ts",
+      "Start": 45,
+      "End": 46
+    },
+    {
+      "DefPath": "__MOD__global.module__test2.var__x64",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/simple-vars-and-classes.ts",
+      "Start": 168,
+      "End": 169
+    },
+    {
+      "DefPath": "__MOD__global.module__test2.var__x64",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/simple-vars-and-classes.ts",
+      "Start": 64,
+      "End": 65
+    },
+    {
+      "DefPath": "__MOD__global.module__test3.class__C1.field__c",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-classes.ts",
+      "Start": 138,
+      "End": 139
+    },
+    {
+      "DefPath": "__MOD__global.module__test3.class__C1.field__c",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-classes.ts",
+      "Start": 48,
+      "End": 49
+    },
+    {
+      "DefPath": "__MOD__global.module__test3.class__C1.field__x",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-classes.ts",
+      "Start": 122,
+      "End": 123
+    },
+    {
+      "DefPath": "__MOD__global.module__test3.class__C1.field__x",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-classes.ts",
+      "Start": 192,
+      "End": 193
+    },
+    {
+      "DefPath": "__MOD__global.module__test3.class__C1.field__x",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-classes.ts",
+      "Start": 67,
+      "End": 68
+    },
+    {
+      "DefPath": "__MOD__global.module__test3.class__C1.field__y",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-classes.ts",
+      "Start": 131,
+      "End": 132
+    },
+    {
+      "DefPath": "__MOD__global.module__test3.class__C1.field__y",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-classes.ts",
+      "Start": 204,
+      "End": 205
+    },
+    {
+      "DefPath": "__MOD__global.module__test3.class__C1.field__y",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-classes.ts",
+      "Start": 86,
+      "End": 87
+    },
+    {
+      "DefPath": "__MOD__global.module__test3.class__C1.field__z",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-classes.ts",
+      "Start": 105,
+      "End": 106
+    },
+    {
+      "DefPath": "__MOD__global.module__test3.class__C1.field__z",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-classes.ts",
+      "Start": 216,
+      "End": 217
+    },
+    {
+      "DefPath": "__MOD__global.module__test3.class__C1",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-classes.ts",
+      "Start": 135,
+      "End": 137
+    },
+    {
+      "DefPath": "__MOD__global.module__test3.class__C1",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-classes.ts",
+      "Start": 165,
+      "End": 167
+    },
+    {
+      "DefPath": "__MOD__global.module__test3.class__C1",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-classes.ts",
+      "Start": 174,
+      "End": 176
+    },
+    {
+      "DefPath": "__MOD__global.module__test3.class__C1",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-classes.ts",
+      "Start": 28,
+      "End": 30
+    },
+    {
+      "DefPath": "__MOD__global.module__test3.var__c1_inst156",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-classes.ts",
+      "Start": 156,
+      "End": 163
+    },
+    {
+      "DefPath": "__MOD__global.module__test3.var__c1_inst156",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-classes.ts",
+      "Start": 184,
+      "End": 191
+    },
+    {
+      "DefPath": "__MOD__global.module__test3.var__c1_inst156",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-classes.ts",
+      "Start": 196,
+      "End": 203
+    },
+    {
+      "DefPath": "__MOD__global.module__test3.var__c1_inst156",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-classes.ts",
+      "Start": 208,
+      "End": 215
+    },
+    {
+      "DefPath": "__MOD__global.module__test4.func__f122.36.132.var__x150",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-let.ts",
+      "Start": 150,
+      "End": 151
+    },
+    {
+      "DefPath": "__MOD__global.module__test4.func__f122.36.132.var__x150",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-let.ts",
+      "Start": 169,
+      "End": 170
+    },
+    {
+      "DefPath": "__MOD__global.module__test4.func__f122.36.58.var__x95",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-let.ts",
+      "Start": 114,
+      "End": 115
+    },
+    {
+      "DefPath": "__MOD__global.module__test4.func__f122.36.58.var__x95",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-let.ts",
+      "Start": 95,
+      "End": 96
+    },
+    {
+      "DefPath": "__MOD__global.module__test4.func__f122.var__x76",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-let.ts",
+      "Start": 76,
+      "End": 77
+    },
+    {
+      "DefPath": "__MOD__global.module__test4.func__f122",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/var-let.ts",
+      "Start": 31,
+      "End": 33
+    },
+    {
+      "DefPath": "__MOD__global.module__test5.class__C1.field__a",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/vars-and-classes-test.ts",
+      "Start": 143,
+      "End": 144
+    },
+    {
+      "DefPath": "__MOD__global.module__test5.class__C1.field__a",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/vars-and-classes-test.ts",
+      "Start": 208,
+      "End": 209
+    },
+    {
+      "DefPath": "__MOD__global.module__test5.class__C1.field__a",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/vars-and-classes-test.ts",
+      "Start": 41,
+      "End": 42
+    },
+    {
+      "DefPath": "__MOD__global.module__test5.class__C1.method__f2(x_string, y_number) {\n            var z_string\n            x + y + z + this.a;\n\n        }.param__x63",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/vars-and-classes-test.ts",
+      "Start": 126,
+      "End": 127
+    },
+    {
+      "DefPath": "__MOD__global.module__test5.class__C1.method__f2(x_string, y_number) {\n            var z_string\n            x + y + z + this.a;\n\n        }.param__x63",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/vars-and-classes-test.ts",
+      "Start": 63,
+      "End": 64
+    },
+    {
+      "DefPath": "__MOD__global.module__test5.class__C1.method__f2(x_string, y_number) {\n            var z_string\n            x + y + z + this.a;\n\n        }.param__y74",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/vars-and-classes-test.ts",
+      "Start": 130,
+      "End": 131
+    },
+    {
+      "DefPath": "__MOD__global.module__test5.class__C1.method__f2(x_string, y_number) {\n            var z_string\n            x + y + z + this.a;\n\n        }.param__y74",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/vars-and-classes-test.ts",
+      "Start": 74,
+      "End": 75
+    },
+    {
+      "DefPath": "__MOD__global.module__test5.class__C1.method__f2(x_string, y_number) {\n            var z_string\n            x + y + z + this.a;\n\n        }.var__z103",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/vars-and-classes-test.ts",
+      "Start": 103,
+      "End": 104
+    },
+    {
+      "DefPath": "__MOD__global.module__test5.class__C1.method__f2(x_string, y_number) {\n            var z_string\n            x + y + z + this.a;\n\n        }.var__z103",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/vars-and-classes-test.ts",
+      "Start": 134,
+      "End": 135
+    },
+    {
+      "DefPath": "__MOD__global.module__test5.class__C1.method__f2(x_string, y_number) {\n            var z_string\n            x + y + z + this.a;\n\n        }",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/vars-and-classes-test.ts",
+      "Start": 223,
+      "End": 225
+    },
+    {
+      "DefPath": "__MOD__global.module__test5.class__C1.method__f2(x_string, y_number) {\n            var z_string\n            x + y + z + this.a;\n\n        }",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/vars-and-classes-test.ts",
+      "Start": 60,
+      "End": 62
+    },
+    {
+      "DefPath": "__MOD__global.module__test5.class__C1",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/vars-and-classes-test.ts",
+      "Start": 181,
+      "End": 183
+    },
+    {
+      "DefPath": "__MOD__global.module__test5.class__C1",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/vars-and-classes-test.ts",
+      "Start": 190,
+      "End": 192
+    },
+    {
+      "DefPath": "__MOD__global.module__test5.class__C1",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/vars-and-classes-test.ts",
+      "Start": 28,
+      "End": 30
+    },
+    {
+      "DefPath": "__MOD__global.module__test5.var__c_inst3172",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/vars-and-classes-test.ts",
+      "Start": 172,
+      "End": 179
+    },
+    {
+      "DefPath": "__MOD__global.module__test5.var__c_inst3172",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/vars-and-classes-test.ts",
+      "Start": 200,
+      "End": 207
+    },
+    {
+      "DefPath": "__MOD__global.module__test5.var__c_inst3172",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-vars-enums-classes/vars-and-classes-test.ts",
+      "Start": 215,
+      "End": 222
+    },
+    {
+      "DefPath": "__MOD__global.var__foo1204",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-interfaces/interface.ts",
+      "Start": 204,
+      "End": 208
+    },
+    {
+      "DefPath": "__MOD__global.var__foo1204",
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-interfaces/interface.ts",
+      "Start": 233,
+      "End": 237
+    },
+    {
+      "DefPath": "__MOD__global.var__foo_inst101",
+      "Def": true,
+      "File": "/Users/tonya/srclib-typescript/testdata/case/typescript-test/test-interfaces/interface.ts",
+      "Start": 101,
+      "End": 109
+    }
+  ]
+}
