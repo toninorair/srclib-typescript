@@ -1,4 +1,21 @@
-{
+{"version": "1.0.0",
+  "name": "srclib-typescript",
+  "description": "Sourcegraph srclib typescript toolchain",
+  "keywords": [
+    "toolchain",
+    "sourcegraph",
+    "typescript",
+  ],
+  "homepage": "https://sourcegraph.com/",
+  "author": {
+    "name": "Antonina Cherednichenko",
+    "email": "acherednichenko@codeminders.com",
+    "url": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sourcegraph/srclib-typescript.git"
+  },
   "dependencies": {
     "async": "^1.5.2",
     "commander": "2.3.0",
@@ -7,5 +24,15 @@
     "read-package-json": "2.0.3",
     "tsconfig": "2.2.0",
     "typescript": "^1.8.2"
-  }
+  },
+ "contributors": [
+    {
+      "name": "Antonina Cherednichenko",
+      "email": "acherednichenko@codeminders.com"
+    },
+    {
+      "name": "Alexander Saveliev",
+      "email": "lyolik@codeminders.com"
+    }
+ ]
 }
