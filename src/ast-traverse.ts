@@ -37,7 +37,6 @@ export class ASTTraverse {
         for (const sourceFile of this.program.getSourceFiles()) {
             var self = this;
             if (!sourceFile.hasNoDefaultLib) {
-                console.error("SRC file = ", sourceFile.fileName);
                 //if (self.program.getRootFileNames().indexOf(sourceFile.fileName) != -1) {
                 let fileName: string = path.parse(sourceFile.fileName).name;
                 self.moduleResolver.addModule(fileName, _isExternalModule(sourceFile, self.checker));
@@ -50,7 +49,6 @@ export class ASTTraverse {
 
             //check whether it is actual source file for analysis
             if (!sourceFile.hasNoDefaultLib) {
-                console.error("DEFS for file = ", sourceFile.fileName);
                 //if (self.program.getRootFileNames().indexOf(sourceFile.fileName) != -1) {
                 // Walk the ast tree to search for defs
                 ts.forEachChild(sourceFile, _collectDefs);
@@ -178,8 +176,6 @@ export class ASTTraverse {
             ts.forEachChild(node, _collectDefs);
         }
     }
-
-
 
     private _emitDef(decl: ts.Declaration, blockedScope: boolean = false) {
         //emitting def here
