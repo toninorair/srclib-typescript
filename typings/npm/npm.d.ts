@@ -5,6 +5,9 @@
 
 /// <reference path="../node/node.d.ts" />
 
+// alexsaveliev: added SilentCommandFunction and changed commands.view 
+// to reflect "npm view" and "npm ls" commands that take 3 parameters instead of two
+
 declare module NPM {
     export interface Static extends NodeJS.EventEmitter {
         config: Config;
@@ -63,9 +66,9 @@ declare module NPM {
 
         help: CommandFunction;
         "help-search": CommandFunction;
-        ls: CommandFunction;
+        ls: SilentCommandFunction;
         search: CommandFunction;
-        view: CommandFunction;
+        view: SilentCommandFunction;
         init: CommandFunction;
         version: CommandFunction;
         edit: CommandFunction;
@@ -129,6 +132,10 @@ declare module NPM {
 
     export interface CommandFunction {
         (args: string[], callback: CommandCallback): void;
+    }
+
+    export interface SilentCommandFunction {
+        (args: string[], silent: boolean, callback: CommandCallback): void;
     }
 
     export interface CommandCallback {
