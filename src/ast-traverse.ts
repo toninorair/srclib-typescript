@@ -317,6 +317,7 @@ export class ASTTraverse {
             case ts.SyntaxKind.EnumDeclaration:
             case ts.SyntaxKind.FunctionDeclaration:
             case ts.SyntaxKind.MethodDeclaration:
+            case ts.SyntaxKind.VariableDeclaration:
             case ts.SyntaxKind.PropertySignature:
             case ts.SyntaxKind.MethodSignature: {
                 let decl = <ts.Declaration>node;
@@ -325,14 +326,15 @@ export class ASTTraverse {
                 return this._getScopesChain(node.parent, blockedScope, newChain);
             }
 
+
             //added for built-in interface initialization
-            case ts.SyntaxKind.VariableDeclaration: {
-                let decl = <ts.VariableDeclaration>node;
-                //TODO temporary decision - find better one
-                let name = "interface" + "__" + decl.type.getText();
-                let newChain = utils.formPath(parentChain, name);
-                return this._getScopesChain(node.parent, blockedScope, newChain);
-            }
+            // case ts.SyntaxKind.VariableDeclaration: {
+            //     let decl = <ts.VariableDeclaration>node;
+            //     //TODO temporary decision - find better one
+            //     let name = "interface" + "__" + decl.type.getText();
+            //     let newChain = utils.formPath(parentChain, name);
+            //     return this._getScopesChain(node.parent, blockedScope, newChain);
+            // }
             case ts.SyntaxKind.Block: {
                 if (blockedScope) {
                     let decl = <ts.Block>node;

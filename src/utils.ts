@@ -18,7 +18,8 @@ export function formFnSignatureForPath(sig: string): string {
     if (sig.indexOf('{') !== -1) {
         sig = sig.substring(0, sig.indexOf('{'));
     }
-    return sig.trim().replace(/;\s*/g, "").replace(/:\s*/g, "_").replace(/ \s*/g, "");
+
+    return sig.trim().replace(/;\s*/g, "").replace(/:\s*/g, "_").replace(/ \s*/g, "").replace(/=>\s*/g, "_").replace(/<\s*/g, "_").replace(/>\s*/g, "_");
 }
 
 export var PATH_SEPARATOR: string = ".";
