@@ -9,6 +9,11 @@ import depresolve = require('./depresolve');
 
 var program = require('commander');
 
+process.on('uncaughtException', function(e) {
+  console.trace(e);
+  process.exit(1);
+});
+
 program.command("scan").action(function() {new scan.ScanAction().execute()});
 program.
     command("graph").
