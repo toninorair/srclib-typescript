@@ -14,6 +14,7 @@ var TESTS_DIR: string = '.';
 
 import fs = require('fs');
 import path = require('path');
+import stream = require('stream');
 var tsconfig = require('tsconfig');
 
 export class ScanAction implements Action {
@@ -78,7 +79,13 @@ export class ScanAction implements Action {
     private _install(): q.Promise<void> {
       var ret : q.Deferred<void> = q.defer<void>();
       console.error("Installing npm packages");
+      // redirecting stdout to null stream
+      var oldWriteHandle = process.stdout.write;
+      var nullStream = new NullWriteableStream();
+      process.stdout.write = nullStream.write.bind(nullStream);
       npm.commands.install([], function(err) {
+        // restoring stdout
+        process.stdout.write = oldWriteHandle;
         if (err) {
           ret.reject(err);
         } else {
@@ -139,4 +146,13 @@ export class ScanAction implements Action {
             return file.replace(new RegExp('\\' + path.sep, 'g'), path.posix.sep);
         });
     }
+}
+
+/**
+ * Stream that does nothing
+ */
+class NullWriteableStream extends stream.Writable {
+  _write(chunk: any, encoding: string, callback: Function): void {
+    callback();
+  }
 }
