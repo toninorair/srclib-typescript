@@ -188,7 +188,7 @@ export class ASTTraverse {
         def.Path = utils.formPath(scopeRes, declNameInScope, true);
         def.TreePath = def.Path;
         def.Kind = this._getDeclarationKindName(decl.kind, true);
-        def.File = decl.getSourceFile().fileName;
+        def.File = path.relative('', decl.getSourceFile().fileName);
         def.DefStart = id.getStart();
         def.DefEnd = id.getEnd();
         this.allObjects.Defs.push(def);
@@ -206,7 +206,7 @@ export class ASTTraverse {
         var scopeRes: string = this._getScopesChain(decl.parent, blockedScope);
         var declNameInScope: string = this._getScopeNameForDeclaration(decl);
         ref.DefPath = utils.formPath(scopeRes, declNameInScope, true);
-        ref.File = id.getSourceFile().fileName;
+        ref.File = path.relative('', id.getSourceFile().fileName);
         ref.Start = id.getStart();
         ref.End = id.getEnd();
         ref.End = id.getEnd();
