@@ -16,7 +16,6 @@ export class ASTTraverse {
     private allDeclIds: Array<ts.Identifier>;
     private moduleResolver: resolver.ModuleResolver;
 
-
     constructor(fileNames: string[]) {
         this.program = ts.createProgram(fileNames, {
             target: ts.ScriptTarget.ES5, module: ts.ModuleKind.CommonJS

@@ -1,3 +1,3 @@
 class Dependency {
-    Name : string;
+    Name: string;
 }

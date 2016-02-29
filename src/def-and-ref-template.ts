@@ -26,8 +26,8 @@ export class Ref {
 
 export class RootObject {
     constructor() {
-      this.Defs = new Array<Def>();
-      this.Refs = new Array<Ref>();
+        this.Defs = new Array<Def>();
+        this.Refs = new Array<Ref>();
     }
     Defs: Array<Def>;
     Refs: Array<Ref>;
