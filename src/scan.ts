@@ -143,7 +143,7 @@ export class ScanAction implements Action {
         return [];
       }
         return (tsConfig.files || []).map(function(file: string) {
-            return file.replace(new RegExp('\\' + path.sep, 'g'), path.posix.sep);
+            return path.relative('', file).replace(new RegExp('\\' + path.sep, 'g'), path.posix.sep);
         });
     }
 }
