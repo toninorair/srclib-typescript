@@ -104,6 +104,7 @@ export class ASTTraverse {
             if (node.kind === ts.SyntaxKind.Identifier) {
                 let id = <ts.Identifier>node;
                 let symbol = self.checker.getSymbolAtLocation(id);
+
                 if (!self._isDeclarationIdentifier(id)) {
                     if (symbol !== undefined) {
                         //emit ref here
@@ -114,6 +115,7 @@ export class ASTTraverse {
                             console.error("MORE THAN ONE DECLARATION FOR ID", id.text, "WAS FOUND")
                         }
                         //get all possible declarations
+
                         for (const decl of symbol.declarations) {
                             if (symbol.declarations.length > 1) {
                                 console.error("DECL for symbol", symbol.name, " = ", decl.getText());
@@ -280,8 +282,8 @@ export class ASTTraverse {
             case ts.SyntaxKind.MethodDeclaration:
                 return this._getDeclarationKindName(decl.kind) + "__" + utils.formFnSignatureForPath(decl.getText());
             //TODO check if it's the best decision
-            case ts.SyntaxKind.PropertyAssignment:
-                return "property_sig" + "__" + (<ts.Identifier>decl.name).text;
+            // case ts.SyntaxKind.PropertyAssignment:
+            //     return "property_sig" + "__" + (<ts.Identifier>decl.name).text;
 
             case ts.SyntaxKind.InterfaceDeclaration:
             case ts.SyntaxKind.VariableDeclaration:
@@ -328,13 +330,6 @@ export class ASTTraverse {
 
 
             //added for built-in interface initialization
-            // case ts.SyntaxKind.VariableDeclaration: {
-            //     let decl = <ts.VariableDeclaration>node;
-            //     //TODO temporary decision - find better one
-            //     let name = "interface" + "__" + decl.type.getText();
-            //     let newChain = utils.formPath(parentChain, name);
-            //     return this._getScopesChain(node.parent, blockedScope, newChain);
-            // }
             case ts.SyntaxKind.Block: {
                 if (blockedScope) {
                     let decl = <ts.Block>node;
