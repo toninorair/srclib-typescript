@@ -137,20 +137,34 @@ export class ASTTraverse {
                     self.allDeclIds.push(<ts.Identifier>decl.name);
                     break;
                 }
+                case ts.SyntaxKind.ImportDeclaration: {
+                    let decl = <ts.ImportDeclaration>node;
+                    if (decl.importClause !== undefined) {
+                        let namedBindings = decl.importClause.namedBindings;
+                        if (namedBindings.kind === ts.SyntaxKind.NamespaceImport) {
+                            let namespaceImport = <ts.NamespaceImport>namedBindings;
+                            self.allDeclIds.push(<ts.Identifier>namespaceImport.name);
+
+                            //emit def here
+                            self._emitDef(namespaceImport);
+
+                        } else if (namedBindings.kind === ts.SyntaxKind.NamedImports) {
+                            let namedImports = <ts.NamedImports>namedBindings;
+                            for (const namedImport of namedImports.elements) {
+                                self.allDeclIds.push(<ts.Identifier>namedImport.name);
+
+                                //emit def here
+                                self._emitDef(namedImport);
+                            }
+                        }
+                    }
+                    break;
+                }
                 case ts.SyntaxKind.ClassDeclaration:
                 case ts.SyntaxKind.InterfaceDeclaration:
                 case ts.SyntaxKind.EnumDeclaration:
                 case ts.SyntaxKind.FunctionDeclaration:
                 case ts.SyntaxKind.MethodDeclaration:
-                //TODO - add support for ImportDeclaration
-                // case ts.SyntaxKind.ImportDeclaration: {
-                //     let decl = <ts.ImportDeclaration>node;
-                //     if (decl.importClause !== undefined) {
-                //         let importClause = decl.importClause;
-                //         importClause.name
-                //
-                //     }
-                // }
                 case ts.SyntaxKind.ImportEqualsDeclaration:
                 case ts.SyntaxKind.Parameter:
                 case ts.SyntaxKind.EnumMember:
@@ -258,6 +272,7 @@ export class ASTTraverse {
                 return fullName ? utils.DefKind.VAR : "var";
             case ts.SyntaxKind.ImportEqualsDeclaration:
             case ts.SyntaxKind.NamespaceImport:
+            case ts.SyntaxKind.ImportSpecifier:
                 return fullName ? utils.DefKind.IMPORT_VAR : "import_var";
             case ts.SyntaxKind.Parameter:
                 return fullName ? utils.DefKind.PARAM : "param";
@@ -327,9 +342,6 @@ export class ASTTraverse {
                 let newChain = utils.formPath(parentChain, name);
                 return this._getScopesChain(node.parent, blockedScope, newChain);
             }
-
-
-            //added for built-in interface initialization
             case ts.SyntaxKind.Block: {
                 if (blockedScope) {
                     let decl = <ts.Block>node;
