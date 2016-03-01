@@ -4,6 +4,7 @@
 /// <reference path="../typings/async/async.d.ts" />
 
 import unit = require('./unit');
+import utils = require('./utils');
 
 import * as npm from "npm";
 import * as q from "q";
@@ -81,7 +82,14 @@ export class ScanAction implements Action {
     private _install(): q.Promise<void> {
       var ret : q.Deferred<void> = q.defer<void>();
       console.error("Installing npm packages");
-      child_process.execFile("npm", ["install"], (err, stdout, stderr) => {
+      // nodejs ignores PATHEXT
+      var npmCmd: string;
+      if (process.platform == "win32") {
+        npmCmd = "npm.cmd";
+      } else {
+        npmCmd = "npm";
+      }
+      child_process.execFile(npmCmd, ["install"], (err, stdout, stderr) => {
         if (err) {
           console.error("An error occured while instaling packages", err);
         }
@@ -138,7 +146,7 @@ export class ScanAction implements Action {
         return [];
       }
         return (tsConfig.files || []).map(function(file: string) {
-            return path.relative('', file).replace(new RegExp('\\' + path.sep, 'g'), path.posix.sep);
+            return utils.normalizePath(file);
         });
     }
 }
