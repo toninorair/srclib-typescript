@@ -1,4 +1,4 @@
-/// <reference path="../typings/typescript/typescript.d.ts" />
+///// <reference path="../typings/typescript/typescript.d.ts" />
 
 import * as fs from "fs";
 import * as ts from "typescript";
