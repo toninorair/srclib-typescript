@@ -1,4 +1,4 @@
-/// <reference path="../typings/typescript/typescript.d.ts" />
+///// <reference path="../typings/typescript/typescript.d.ts" />
 
 import * as fs from "fs";
 import * as ts from "typescript";
@@ -110,16 +110,19 @@ export class ASTTraverse {
                         if (symbol.valueDeclaration === undefined) {
                             console.error("VALUE DECLARATION FOR ID", id.text, "IS UNDEFINED");
                         }
-                        if (symbol.declarations.length > 1) {
-                            console.error("MORE THAN ONE DECLARATION FOR ID", id.text, "WAS FOUND")
-                        }
-                        //get all possible declarations
-
-                        for (const decl of symbol.declarations) {
+                        if (symbol.declarations !== undefined) {
                             if (symbol.declarations.length > 1) {
-                                console.error("DECL for symbol", symbol.name, " = ", decl.getText());
+                                console.error("MORE THAN ONE DECLARATION FOR ID", id.text, "WAS FOUND")
                             }
-                            self._emitRef(decl, id, self._isBlockedScopeSymbol(symbol));
+                            //get all possible declarations
+                            //self._emitRef(symbol.declarations[0], id, self._isBlockedScopeSymbol(symbol));
+                            for (const decl of symbol.declarations) {
+                                if (symbol.declarations.length > 1) {
+                                    //console.error("DECL for symbol", symbol.name, " = ", decl.getText());
+                                }
+                                self._emitRef(decl, id, self._isBlockedScopeSymbol(symbol));
+                                break;
+                            }
                         }
                     } else {
                         console.error("UNDEF SYMBOL", id.text);
@@ -182,6 +185,10 @@ export class ASTTraverse {
                     let decl = <ts.VariableDeclaration>node;
                     self.allDeclIds.push(<ts.Identifier>decl.name);
                     let symbol = self.checker.getSymbolAtLocation(decl.name);
+                    if (symbol === undefined) {
+                        console.error("UNDEFINED SYMBOL IN VAR DECL");
+                        break;
+                    }
 
                     //emit def here
                     self._emitDef(decl, self._isBlockedScopeSymbol(symbol));
@@ -201,7 +208,9 @@ export class ASTTraverse {
 
         //fill data field
         def.Data = new defs.Data();
-        def.Data.Type = this.checker.typeToString(this.checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration));
+        if (symbol !== undefined) {
+            def.Data.Type = this.checker.typeToString(this.checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration));
+        }
         def.Data.Keyword = this._getDeclarationKindName(decl.kind);
         def.Data.Kind = this._getDeclarationKindName(decl.kind, true);
         def.Data.Separator = " ";
@@ -219,8 +228,8 @@ export class ASTTraverse {
 
         //emit special ref with Def field set into true
         this._emitRef(decl, id, blockedScope, true);
-        console.error(JSON.stringify(def));
-        console.error("-------------------");
+        // console.error(JSON.stringify(def));
+        // console.error("-------------------");
     }
 
     //now declaration is provided as node here
@@ -239,8 +248,8 @@ export class ASTTraverse {
             ref.Def = true;
         }
         this.allObjects.Refs.push(ref);
-        console.error(JSON.stringify(ref));
-        console.error("-------------------");
+        // console.error(JSON.stringify(ref));
+        // console.error("-------------------");
     }
 
     private _isBlockedScopeSymbol(symbol: ts.Symbol): boolean {
@@ -307,19 +316,17 @@ export class ASTTraverse {
             //TODO check if it's the best decision
             // case ts.SyntaxKind.PropertyAssignment:
             //     return "property_sig" + "__" + (<ts.Identifier>decl.name).text;
-
-            case ts.SyntaxKind.InterfaceDeclaration:
             case ts.SyntaxKind.VariableDeclaration:
+                return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text + decl.getStart()
+                    + path.relative('', decl.getSourceFile().fileName);
+            case ts.SyntaxKind.InterfaceDeclaration:
+            case ts.SyntaxKind.ModuleDeclaration:
             case ts.SyntaxKind.Parameter:
             case ts.SyntaxKind.FunctionDeclaration:
                 return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text + decl.getStart();
             default:
                 return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text;
         }
-    }
-
-    private _isInterfaceType(type: ts.Type): boolean {
-        return (type.flags & ts.TypeFlags.Interface) != 0;
     }
 
     private _getScopesChain(node: ts.Node, blockedScope: boolean, parentChain: string = ""): string {

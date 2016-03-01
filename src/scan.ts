@@ -15,6 +15,8 @@ var TESTS_DIR: string = '.';
 import fs = require('fs');
 import path = require('path');
 import stream = require('stream');
+import child_process = require('child_process');
+
 var tsconfig = require('tsconfig');
 
 export class ScanAction implements Action {
@@ -79,19 +81,14 @@ export class ScanAction implements Action {
     private _install(): q.Promise<void> {
       var ret : q.Deferred<void> = q.defer<void>();
       console.error("Installing npm packages");
-      // redirecting stdout to null stream
-      var oldWriteHandle = process.stdout.write;
-      var nullStream = new NullWriteableStream();
-      process.stdout.write = nullStream.write.bind(nullStream);
-      npm.commands.install([], function(err) {
-        // restoring stdout
-        process.stdout.write = oldWriteHandle;
+      child_process.execFile("npm", ["install"], (err, stdout, stderr) => {
         if (err) {
-          ret.reject(err);
-        } else {
-          console.error("npm packages are installed");
-          ret.resolve();
+          console.error("An error occured while instaling packages", err);
         }
+        console.error("npm install stdout", stdout);
+        console.error("npm install stderr", stderr);
+        console.error("npm packages are installed");
+        ret.resolve();
       });
       return ret.promise;
     }
@@ -101,11 +98,10 @@ export class ScanAction implements Action {
       console.error("Retrieving installed npm packages");
       npm.commands.ls([], true, function(err, data, deps) {
         if (err) {
-          ret.reject(err);
-        } else {
-          console.error("Retrieved installed npm packages");
-          ret.resolve(deps);
+          console.error("An error occured while retrieving deps", err);
         }
+        console.error("Retrieved installed npm packages");
+        ret.resolve(deps || {});
       });
       return ret.promise;
     }
@@ -125,11 +121,10 @@ export class ScanAction implements Action {
       }, function() {});
       async.parallel(tasks, function(err, data) {
         if (err) {
-          ret.reject(err);
-        } else {
-          console.error("Retrieved repositories");
-          ret.resolve(data);
+          console.error("An error occured while retrieving repositories", err);
         }
+        console.error("Retrieved repositories");
+        ret.resolve(data || []);
       });
 
       return ret.promise;
@@ -146,13 +141,4 @@ export class ScanAction implements Action {
             return path.relative('', file).replace(new RegExp('\\' + path.sep, 'g'), path.posix.sep);
         });
     }
-}
-
-/**
- * Stream that does nothing
- */
-class NullWriteableStream extends stream.Writable {
-  _write(chunk: any, encoding: string, callback: Function): void {
-    callback();
-  }
 }
