@@ -1,6 +1,6 @@
 /// <reference path="../typings/node/node.d.ts" />
 
-var fs = require('fs');
+import fs = require('fs');
 import traverse = require('./ast-traverse');
 import unit = require('./unit');
 

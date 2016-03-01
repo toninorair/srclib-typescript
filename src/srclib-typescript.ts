@@ -7,7 +7,7 @@ import graph = require('./graph');
 import scan = require('./scan');
 import depresolve = require('./depresolve');
 
-var program = require('commander');
+import program = require('commander');
 
 process.on('uncaughtException', function(e) {
   console.trace(e);
