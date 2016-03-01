@@ -182,6 +182,10 @@ export class ASTTraverse {
                     let decl = <ts.VariableDeclaration>node;
                     self.allDeclIds.push(<ts.Identifier>decl.name);
                     let symbol = self.checker.getSymbolAtLocation(decl.name);
+                    if (symbol === undefined) {
+                        console.error("UNDEFINED SYMBOL IN VAR DECL");
+                        break;
+                    }
 
                     //emit def here
                     self._emitDef(decl, self._isBlockedScopeSymbol(symbol));
@@ -318,9 +322,9 @@ export class ASTTraverse {
         }
     }
 
-    private _isInterfaceType(type: ts.Type): boolean {
-        return (type.flags & ts.TypeFlags.Interface) != 0;
-    }
+    // private _isInterfaceType(type: ts.Type): boolean {
+    //     return (type.flags & ts.TypeFlags.Interface) != 0;
+    // }
 
     private _getScopesChain(node: ts.Node, blockedScope: boolean, parentChain: string = ""): string {
         if (node.kind === ts.SyntaxKind.SourceFile) {
