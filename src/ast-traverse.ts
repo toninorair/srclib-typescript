@@ -110,16 +110,18 @@ export class ASTTraverse {
                         if (symbol.valueDeclaration === undefined) {
                             console.error("VALUE DECLARATION FOR ID", id.text, "IS UNDEFINED");
                         }
-                        if (symbol.declarations.length > 1) {
-                            console.error("MORE THAN ONE DECLARATION FOR ID", id.text, "WAS FOUND")
-                        }
-                        //get all possible declarations
-
-                        for (const decl of symbol.declarations) {
+                        if (symbol.declarations !== undefined) {
                             if (symbol.declarations.length > 1) {
-                                console.error("DECL for symbol", symbol.name, " = ", decl.getText());
+                                console.error("MORE THAN ONE DECLARATION FOR ID", id.text, "WAS FOUND")
                             }
-                            self._emitRef(decl, id, self._isBlockedScopeSymbol(symbol));
+                            //get all possible declarations
+
+                            for (const decl of symbol.declarations) {
+                                if (symbol.declarations.length > 1) {
+                                    console.error("DECL for symbol", symbol.name, " = ", decl.getText());
+                                }
+                                self._emitRef(decl, id, self._isBlockedScopeSymbol(symbol));
+                            }
                         }
                     } else {
                         console.error("UNDEF SYMBOL", id.text);
@@ -225,8 +227,8 @@ export class ASTTraverse {
 
         //emit special ref with Def field set into true
         this._emitRef(decl, id, blockedScope, true);
-        console.error(JSON.stringify(def));
-        console.error("-------------------");
+        // console.error(JSON.stringify(def));
+        // console.error("-------------------");
     }
 
     //now declaration is provided as node here
@@ -245,8 +247,8 @@ export class ASTTraverse {
             ref.Def = true;
         }
         this.allObjects.Refs.push(ref);
-        console.error(JSON.stringify(ref));
-        console.error("-------------------");
+        // console.error(JSON.stringify(ref));
+        // console.error("-------------------");
     }
 
     private _isBlockedScopeSymbol(symbol: ts.Symbol): boolean {
