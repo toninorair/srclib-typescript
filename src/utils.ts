@@ -23,7 +23,7 @@ export function formFnSignatureForPath(sig: string): string {
 
     return sig.trim().replace(/;\s*/g, "").replace(/:\s*/g, "_").replace(/ \s*/g, "").
         replace(/=>\s*/g, "_").replace(/<\s*/g, "_").replace(/>\s*/g, "_").
-        replace(/\?\s*/g, "_").replace(/(\s*/g, "_").replace(/)\s*/g, "_");
+        replace(/\?\s*/g, "_").replace(/\(\s*/g, "_").replace(/\)\s*/g, "_");
 }
 
 export function formTypeSignatureForDoc(type: string): string {
