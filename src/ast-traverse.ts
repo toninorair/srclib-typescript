@@ -318,6 +318,7 @@ export class ASTTraverse {
 
             case ts.SyntaxKind.InterfaceDeclaration:
             case ts.SyntaxKind.VariableDeclaration:
+            case ts.SyntaxKind.ModuleDeclaration:
             case ts.SyntaxKind.Parameter:
             case ts.SyntaxKind.FunctionDeclaration:
                 return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text + decl.getStart();
