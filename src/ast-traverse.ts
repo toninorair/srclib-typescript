@@ -205,7 +205,9 @@ export class ASTTraverse {
 
         //fill data field
         def.Data = new defs.Data();
-        def.Data.Type = this.checker.typeToString(this.checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration));
+        if (symbol !== undefined) {
+            def.Data.Type = this.checker.typeToString(this.checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration));
+        }
         def.Data.Keyword = this._getDeclarationKindName(decl.kind);
         def.Data.Kind = this._getDeclarationKindName(decl.kind, true);
         def.Data.Separator = " ";
@@ -321,10 +323,6 @@ export class ASTTraverse {
                 return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text;
         }
     }
-
-    // private _isInterfaceType(type: ts.Type): boolean {
-    //     return (type.flags & ts.TypeFlags.Interface) != 0;
-    // }
 
     private _getScopesChain(node: ts.Node, blockedScope: boolean, parentChain: string = ""): string {
         if (node.kind === ts.SyntaxKind.SourceFile) {
