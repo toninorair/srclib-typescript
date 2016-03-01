@@ -221,7 +221,7 @@ export class ASTTraverse {
         def.Path = utils.formPath(scopeRes, declNameInScope, true);
         def.TreePath = def.Path;
         def.Kind = this._getDeclarationKindName(decl.kind, true);
-        def.File = path.relative('', decl.getSourceFile().fileName);
+        def.File = utils.normalizePath(decl.getSourceFile().fileName);
         def.DefStart = id.getStart();
         def.DefEnd = id.getEnd();
         this.allObjects.Defs.push(def);
@@ -239,7 +239,7 @@ export class ASTTraverse {
         var scopeRes: string = this._getScopesChain(decl.parent, blockedScope);
         var declNameInScope: string = this._getScopeNameForDeclaration(decl);
         ref.DefPath = utils.formPath(scopeRes, declNameInScope, true);
-        ref.File = path.relative('', id.getSourceFile().fileName);
+        ref.File = utils.normalizePath(id.getSourceFile().fileName);
         ref.Start = id.getStart();
         ref.End = id.getEnd();
         ref.End = id.getEnd();
@@ -318,7 +318,7 @@ export class ASTTraverse {
             //     return "property_sig" + "__" + (<ts.Identifier>decl.name).text;
             case ts.SyntaxKind.VariableDeclaration:
                 return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text + decl.getStart()
-                    + path.relative('', decl.getSourceFile().fileName);
+                    + utils.normalizePath(decl.getSourceFile().fileName);
             case ts.SyntaxKind.InterfaceDeclaration:
             case ts.SyntaxKind.ModuleDeclaration:
             case ts.SyntaxKind.Parameter:

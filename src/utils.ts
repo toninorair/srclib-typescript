@@ -1,3 +1,5 @@
+import * as path from "path";
+
 export class DefKind {
     static CLASS: string = "class";
     static FUNC: string = "function";
@@ -32,4 +34,9 @@ export function formPath(scope: string, element, addToTheEnd: boolean = false): 
     } else {
         return (scope === "") ? element : element + PATH_SEPARATOR + scope;
     }
+}
+
+export function normalizePath(file: string): string {
+  return path.relative('', file).
+    replace(new RegExp('\\' + path.sep, 'g'), path.posix.sep);
 }
