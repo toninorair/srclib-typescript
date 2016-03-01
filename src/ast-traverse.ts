@@ -118,7 +118,7 @@ export class ASTTraverse {
 
                             for (const decl of symbol.declarations) {
                                 if (symbol.declarations.length > 1) {
-                                    console.error("DECL for symbol", symbol.name, " = ", decl.getText());
+                                    //console.error("DECL for symbol", symbol.name, " = ", decl.getText());
                                 }
                                 self._emitRef(decl, id, self._isBlockedScopeSymbol(symbol));
                             }
