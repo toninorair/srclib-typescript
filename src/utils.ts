@@ -14,7 +14,14 @@ export class DefKind {
     static IMPORT_VAR = "imported var"
 }
 export function formFnSignatureForPath(sig: string): string {
-    return sig.trim().replace(';', '').replace(' ', '').replace(/:\s*/g, "_");;
+    //check whether it is method with implementation
+    if (sig.indexOf('{') !== -1) {
+        sig = sig.substring(0, sig.indexOf('{'));
+    }
+
+    return sig.trim().replace(/;\s*/g, "").replace(/:\s*/g, "_").replace(/ \s*/g, "").
+        replace(/=>\s*/g, "_").replace(/<\s*/g, "_").replace(/>\s*/g, "_").
+        replace(/\?\s*/g, "_");
 }
 
 export var PATH_SEPARATOR: string = ".";

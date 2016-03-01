@@ -16,7 +16,6 @@ export class ASTTraverse {
     private allDeclIds: Array<ts.Identifier>;
     private moduleResolver: resolver.ModuleResolver;
 
-
     constructor(fileNames: string[]) {
         this.program = ts.createProgram(fileNames, {
             target: ts.ScriptTarget.ES5, module: ts.ModuleKind.CommonJS
@@ -37,7 +36,6 @@ export class ASTTraverse {
         for (const sourceFile of this.program.getSourceFiles()) {
             var self = this;
             if (!sourceFile.hasNoDefaultLib) {
-                console.error("SRC file = ", sourceFile.fileName);
                 //if (self.program.getRootFileNames().indexOf(sourceFile.fileName) != -1) {
                 let fileName: string = path.parse(sourceFile.fileName).name;
                 self.moduleResolver.addModule(fileName, _isExternalModule(sourceFile, self.checker));
@@ -50,7 +48,6 @@ export class ASTTraverse {
 
             //check whether it is actual source file for analysis
             if (!sourceFile.hasNoDefaultLib) {
-                console.error("DEFS for file = ", sourceFile.fileName);
                 //if (self.program.getRootFileNames().indexOf(sourceFile.fileName) != -1) {
                 // Walk the ast tree to search for defs
                 ts.forEachChild(sourceFile, _collectDefs);
@@ -106,6 +103,7 @@ export class ASTTraverse {
             if (node.kind === ts.SyntaxKind.Identifier) {
                 let id = <ts.Identifier>node;
                 let symbol = self.checker.getSymbolAtLocation(id);
+
                 if (!self._isDeclarationIdentifier(id)) {
                     if (symbol !== undefined) {
                         //emit ref here
@@ -116,6 +114,7 @@ export class ASTTraverse {
                             console.error("MORE THAN ONE DECLARATION FOR ID", id.text, "WAS FOUND")
                         }
                         //get all possible declarations
+
                         for (const decl of symbol.declarations) {
                             if (symbol.declarations.length > 1) {
                                 console.error("DECL for symbol", symbol.name, " = ", decl.getText());
@@ -137,20 +136,34 @@ export class ASTTraverse {
                     self.allDeclIds.push(<ts.Identifier>decl.name);
                     break;
                 }
+                case ts.SyntaxKind.ImportDeclaration: {
+                    let decl = <ts.ImportDeclaration>node;
+                    if (decl.importClause !== undefined) {
+                        let namedBindings = decl.importClause.namedBindings;
+                        if (namedBindings.kind === ts.SyntaxKind.NamespaceImport) {
+                            let namespaceImport = <ts.NamespaceImport>namedBindings;
+                            self.allDeclIds.push(<ts.Identifier>namespaceImport.name);
+
+                            //emit def here
+                            self._emitDef(namespaceImport);
+
+                        } else if (namedBindings.kind === ts.SyntaxKind.NamedImports) {
+                            let namedImports = <ts.NamedImports>namedBindings;
+                            for (const namedImport of namedImports.elements) {
+                                self.allDeclIds.push(<ts.Identifier>namedImport.name);
+
+                                //emit def here
+                                self._emitDef(namedImport);
+                            }
+                        }
+                    }
+                    break;
+                }
                 case ts.SyntaxKind.ClassDeclaration:
                 case ts.SyntaxKind.InterfaceDeclaration:
                 case ts.SyntaxKind.EnumDeclaration:
                 case ts.SyntaxKind.FunctionDeclaration:
                 case ts.SyntaxKind.MethodDeclaration:
-                //TODO - add support for ImportDeclaration
-                // case ts.SyntaxKind.ImportDeclaration: {
-                //     let decl = <ts.ImportDeclaration>node;
-                //     if (decl.importClause !== undefined) {
-                //         let importClause = decl.importClause;
-                //         importClause.name
-                //
-                //     }
-                // }
                 case ts.SyntaxKind.ImportEqualsDeclaration:
                 case ts.SyntaxKind.Parameter:
                 case ts.SyntaxKind.EnumMember:
@@ -179,20 +192,27 @@ export class ASTTraverse {
         }
     }
 
-
-
     private _emitDef(decl: ts.Declaration, blockedScope: boolean = false) {
         //emitting def here
         var def: defs.Def = new defs.Def();
         var id: ts.Identifier = <ts.Identifier>decl.name;
         def.Name = id.text;
+        let symbol = this.checker.getSymbolAtLocation(decl.name);
+
+        //fill data field
+        def.Data = new defs.Data();
+        def.Data.Type = this.checker.typeToString(this.checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration));
+        def.Data.Keyword = this._getDeclarationKindName(decl.kind);
+        def.Data.Kind = this._getDeclarationKindName(decl.kind, true);
+        def.Data.Separator = " ";
+
         //def.Path = this.checker.getFullyQualifiedName(symbol);
         var scopeRes: string = this._getScopesChain(decl.parent, blockedScope);
         var declNameInScope: string = this._getScopeNameForDeclaration(decl);
         def.Path = utils.formPath(scopeRes, declNameInScope, true);
         def.TreePath = def.Path;
         def.Kind = this._getDeclarationKindName(decl.kind, true);
-        def.File = decl.getSourceFile().fileName;
+        def.File = path.relative('', decl.getSourceFile().fileName);
         def.DefStart = id.getStart();
         def.DefEnd = id.getEnd();
         this.allObjects.Defs.push(def);
@@ -210,7 +230,7 @@ export class ASTTraverse {
         var scopeRes: string = this._getScopesChain(decl.parent, blockedScope);
         var declNameInScope: string = this._getScopeNameForDeclaration(decl);
         ref.DefPath = utils.formPath(scopeRes, declNameInScope, true);
-        ref.File = id.getSourceFile().fileName;
+        ref.File = path.relative('', id.getSourceFile().fileName);
         ref.Start = id.getStart();
         ref.End = id.getEnd();
         ref.End = id.getEnd();
@@ -260,6 +280,7 @@ export class ASTTraverse {
                 return fullName ? utils.DefKind.VAR : "var";
             case ts.SyntaxKind.ImportEqualsDeclaration:
             case ts.SyntaxKind.NamespaceImport:
+            case ts.SyntaxKind.ImportSpecifier:
                 return fullName ? utils.DefKind.IMPORT_VAR : "import_var";
             case ts.SyntaxKind.Parameter:
                 return fullName ? utils.DefKind.PARAM : "param";
@@ -284,8 +305,8 @@ export class ASTTraverse {
             case ts.SyntaxKind.MethodDeclaration:
                 return this._getDeclarationKindName(decl.kind) + "__" + utils.formFnSignatureForPath(decl.getText());
             //TODO check if it's the best decision
-            case ts.SyntaxKind.PropertyAssignment:
-                return "property_sig" + "__" + (<ts.Identifier>decl.name).text;
+            // case ts.SyntaxKind.PropertyAssignment:
+            //     return "property_sig" + "__" + (<ts.Identifier>decl.name).text;
 
             case ts.SyntaxKind.InterfaceDeclaration:
             case ts.SyntaxKind.VariableDeclaration:
@@ -295,6 +316,10 @@ export class ASTTraverse {
             default:
                 return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text;
         }
+    }
+
+    private _isInterfaceType(type: ts.Type): boolean {
+        return (type.flags & ts.TypeFlags.Interface) != 0;
     }
 
     private _getScopesChain(node: ts.Node, blockedScope: boolean, parentChain: string = ""): string {
@@ -321,19 +346,11 @@ export class ASTTraverse {
             case ts.SyntaxKind.EnumDeclaration:
             case ts.SyntaxKind.FunctionDeclaration:
             case ts.SyntaxKind.MethodDeclaration:
+            case ts.SyntaxKind.VariableDeclaration:
             case ts.SyntaxKind.PropertySignature:
             case ts.SyntaxKind.MethodSignature: {
                 let decl = <ts.Declaration>node;
                 let name = this._getScopeNameForDeclaration(decl);
-                let newChain = utils.formPath(parentChain, name);
-                return this._getScopesChain(node.parent, blockedScope, newChain);
-            }
-
-            //added for built-in interface initialization
-            case ts.SyntaxKind.VariableDeclaration: {
-                let decl = <ts.VariableDeclaration>node;
-                //TODO temporary decision - find better one
-                let name = "interface" + "__" + decl.type.getText();
                 let newChain = utils.formPath(parentChain, name);
                 return this._getScopesChain(node.parent, blockedScope, newChain);
             }
