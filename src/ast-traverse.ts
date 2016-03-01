@@ -115,12 +115,13 @@ export class ASTTraverse {
                                 console.error("MORE THAN ONE DECLARATION FOR ID", id.text, "WAS FOUND")
                             }
                             //get all possible declarations
-
+                            //self._emitRef(symbol.declarations[0], id, self._isBlockedScopeSymbol(symbol));
                             for (const decl of symbol.declarations) {
                                 if (symbol.declarations.length > 1) {
                                     //console.error("DECL for symbol", symbol.name, " = ", decl.getText());
                                 }
                                 self._emitRef(decl, id, self._isBlockedScopeSymbol(symbol));
+                                break;
                             }
                         }
                     } else {
@@ -315,9 +316,10 @@ export class ASTTraverse {
             //TODO check if it's the best decision
             // case ts.SyntaxKind.PropertyAssignment:
             //     return "property_sig" + "__" + (<ts.Identifier>decl.name).text;
-
-            case ts.SyntaxKind.InterfaceDeclaration:
             case ts.SyntaxKind.VariableDeclaration:
+                return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text + decl.getStart()
+                    + path.relative('', decl.getSourceFile().fileName);
+            case ts.SyntaxKind.InterfaceDeclaration:
             case ts.SyntaxKind.ModuleDeclaration:
             case ts.SyntaxKind.Parameter:
             case ts.SyntaxKind.FunctionDeclaration:
