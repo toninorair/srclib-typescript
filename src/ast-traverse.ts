@@ -197,6 +197,15 @@ export class ASTTraverse {
         var def: defs.Def = new defs.Def();
         var id: ts.Identifier = <ts.Identifier>decl.name;
         def.Name = id.text;
+        let symbol = this.checker.getSymbolAtLocation(decl.name);
+
+        //fill data field
+        def.Data = new defs.Data();
+        def.Data.Type = this.checker.typeToString(this.checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration));
+        def.Data.Keyword = this._getDeclarationKindName(decl.kind);
+        def.Data.Kind = this._getDeclarationKindName(decl.kind, true);
+        def.Data.Separator = " ";
+
         //def.Path = this.checker.getFullyQualifiedName(symbol);
         var scopeRes: string = this._getScopesChain(decl.parent, blockedScope);
         var declNameInScope: string = this._getScopeNameForDeclaration(decl);
@@ -307,6 +316,10 @@ export class ASTTraverse {
             default:
                 return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text;
         }
+    }
+
+    private _isInterfaceType(type: ts.Type): boolean {
+        return (type.flags & ts.TypeFlags.Interface) != 0;
     }
 
     private _getScopesChain(node: ts.Node, blockedScope: boolean, parentChain: string = ""): string {
