@@ -105,24 +105,17 @@ export class ASTTraverse {
                 let symbol = self.checker.getSymbolAtLocation(id);
 
                 if (!self._isDeclarationIdentifier(id)) {
-                    if (symbol !== undefined) {
+                    if (symbol !== undefined && symbol.declarations !== undefined) {
                         //emit ref here
                         if (symbol.valueDeclaration === undefined) {
                             console.error("VALUE DECLARATION FOR ID", id.text, "IS UNDEFINED");
                         }
-                        if (symbol.declarations !== undefined) {
-                            if (symbol.declarations.length > 1) {
-                                console.error("MORE THAN ONE DECLARATION FOR ID", id.text, "WAS FOUND")
-                            }
-                            //get all possible declarations
-                            //self._emitRef(symbol.declarations[0], id, self._isBlockedScopeSymbol(symbol));
-                            for (const decl of symbol.declarations) {
-                                if (symbol.declarations.length > 1) {
-                                    //console.error("DECL for symbol", symbol.name, " = ", decl.getText());
-                                }
-                                self._emitRef(decl, id, self._isBlockedScopeSymbol(symbol));
-                                break;
-                            }
+                        if (symbol.declarations.length > 1) {
+                            console.error("MORE THAN ONE DECLARATION FOR ID", id.text, "WAS FOUND")
+                        }
+                        //get all possible declarations
+                        for (const decl of symbol.declarations) {
+                            self._emitRef(decl, id, self._isBlockedScopeSymbol(symbol));
                         }
                     } else {
                         console.error("UNDEF SYMBOL", id.text);
@@ -141,7 +134,7 @@ export class ASTTraverse {
                 }
                 case ts.SyntaxKind.ImportDeclaration: {
                     let decl = <ts.ImportDeclaration>node;
-                    if (decl.importClause !== undefined) {
+                    if (decl.importClause !== undefined && decl.importClause.namedBindings !== undefined) {
                         let namedBindings = decl.importClause.namedBindings;
                         if (namedBindings.kind === ts.SyntaxKind.NamespaceImport) {
                             let namespaceImport = <ts.NamespaceImport>namedBindings;
@@ -213,7 +206,7 @@ export class ASTTraverse {
         }
         def.Data.Keyword = this._getDeclarationKindName(decl.kind);
         def.Data.Kind = this._getDeclarationKindName(decl.kind, true);
-        def.Data.Separator = " ";
+        def.Data.Separator = utils.DATA_DOC_SEPARATOR;
 
         //def.Path = this.checker.getFullyQualifiedName(symbol);
         var scopeRes: string = this._getScopesChain(decl.parent, blockedScope);
@@ -317,10 +310,12 @@ export class ASTTraverse {
             // case ts.SyntaxKind.PropertyAssignment:
             //     return "property_sig" + "__" + (<ts.Identifier>decl.name).text;
             case ts.SyntaxKind.VariableDeclaration:
+            case ts.SyntaxKind.ModuleDeclaration:
                 return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text + decl.getStart()
                     + utils.normalizePath(decl.getSourceFile().fileName);
+
             case ts.SyntaxKind.InterfaceDeclaration:
-            case ts.SyntaxKind.ModuleDeclaration:
+            //case ts.SyntaxKind.ModuleDeclaration:
             case ts.SyntaxKind.Parameter:
             case ts.SyntaxKind.FunctionDeclaration:
                 return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text + decl.getStart();
@@ -373,18 +368,3 @@ export class ASTTraverse {
         }
     }
 }
-
-// private _isExternalDeclaration(node: ts.Node, decl: ts.Declaration) {
-//     let nodeFile: string = node.getSourceFile().fileName;
-//     let declFile: string = decl.getSourceFile().fileName;
-//     if (nodeFile === declFile) {
-//         return false;
-//     }
-//
-//     for (const sourceFile of this.program.getRootFileNames()) {
-//         if (sourceFile === declFile) {
-//             return false;
-//         }
-//     }
-//     return true;
-// }

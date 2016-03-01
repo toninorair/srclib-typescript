@@ -23,10 +23,16 @@ export function formFnSignatureForPath(sig: string): string {
 
     return sig.trim().replace(/;\s*/g, "").replace(/:\s*/g, "_").replace(/ \s*/g, "").
         replace(/=>\s*/g, "_").replace(/<\s*/g, "_").replace(/>\s*/g, "_").
-        replace(/\?\s*/g, "_");
+        replace(/\?\s*/g, "_").replace(/(\s*/g, "_").replace(/)\s*/g, "_");
+}
+
+export function formTypeSignatureForDoc(type: string): string {
+    return type;
 }
 
 export var PATH_SEPARATOR: string = ".";
+
+export var DATA_DOC_SEPARATOR: string = " ";
 
 export function formPath(scope: string, element, addToTheEnd: boolean = false): string {
     if (addToTheEnd) {
