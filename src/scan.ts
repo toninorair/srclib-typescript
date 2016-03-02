@@ -10,8 +10,8 @@ import * as npm from "npm";
 import * as q from "q";
 import * as async from "async";
 
-var D_TS_SUFFIX: string = 'd.ts';
-var TESTS_DIR: string = '.';
+const TESTS_DIR: string = '.';
+const TSCONFIG_JSON : string = 'tsconfig.json';
 
 import fs = require('fs');
 import path = require('path');
@@ -28,6 +28,10 @@ export class ScanAction implements Action {
         var sourceUnit = new unit.SourceUnit();
         sourceUnit.Type = 'TypeScriptModule';
 
+        if (!fs.existsSync(TSCONFIG_JSON)) {
+          console.log('[]');
+          return;
+        }
         q.
         when(self._initializeNpm()).
         then(self._install).
