@@ -35,11 +35,8 @@ export class ASTTraverse {
 
         for (const sourceFile of this.program.getSourceFiles()) {
             var self = this;
-            if (!sourceFile.hasNoDefaultLib) {
-                // console.error("SOURCE FILE = ", sourceFile.fileName);
-                // if (self.program.getRootFileNames().indexOf(sourceFile.fileName) != -1) {
-                //     console.error("SOURCE FILE2 = ", sourceFile.fileName);
-                // }
+            //if (!sourceFile.hasNoDefaultLib) {
+            if (self.program.getRootFileNames().indexOf(sourceFile.fileName) != -1) {
                 let fileName: string = path.parse(sourceFile.fileName).name;
                 self.moduleResolver.addModule(fileName, _isExternalModule(sourceFile, self.checker));
             }
@@ -50,8 +47,8 @@ export class ASTTraverse {
             var self = this;
 
             //check whether it is actual source file for analysis
-            if (!sourceFile.hasNoDefaultLib) {
-                //if (self.program.getRootFileNames().indexOf(sourceFile.fileName) != -1) {
+            //if (!sourceFile.hasNoDefaultLib) {
+            if (self.program.getRootFileNames().indexOf(sourceFile.fileName) != -1) {
                 // Walk the ast tree to search for defs
                 ts.forEachChild(sourceFile, _collectDefs);
             }
@@ -61,8 +58,8 @@ export class ASTTraverse {
         for (const sourceFile of this.program.getSourceFiles()) {
             var self = this;
             //check whether it is actual source file for analysis
-            if (!sourceFile.hasNoDefaultLib) {
-                //if (self.program.getRootFileNames().indexOf(sourceFile.fileName) != -1) {
+            //if (!sourceFile.hasNoDefaultLib) {
+            if (self.program.getRootFileNames().indexOf(sourceFile.fileName) != -1) {
                 // Walk the ast tree to search for refs
                 ts.forEachChild(sourceFile, _collectRefs);
             }
@@ -327,6 +324,7 @@ export class ASTTraverse {
             default:
                 return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text
                     + decl.getStart() + "__" + this.program.getSourceFiles().indexOf(decl.getSourceFile());
+
         }
     }
 
