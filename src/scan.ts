@@ -54,6 +54,22 @@ export class ScanAction implements Action {
         }).
         then(self._collectFiles).
         then(function(files) {
+          files.forEach(function(file:string) {
+            try {
+              var content = fs.readFileSync(file).toString();
+              var matcher = /^\/\/\/.?<reference\s+path\s*=\s*\"([^"]+)\"/gm;
+              var refPath;
+              while (refPath = matcher.exec(content)) {
+                  refPath = utils.normalizePath(
+                    path.resolve(path.dirname(file), refPath[1]));
+                  if (files.indexOf(refPath) < 0 && fs.existsSync(refPath)) {
+                    files.push(refPath);
+                  }
+              }
+            } catch (e) {
+              console.error(e);
+            }
+          });
           sourceUnit.Files = files;
         }).
         then(function() {
