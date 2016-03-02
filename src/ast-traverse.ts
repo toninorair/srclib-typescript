@@ -36,7 +36,10 @@ export class ASTTraverse {
         for (const sourceFile of this.program.getSourceFiles()) {
             var self = this;
             if (!sourceFile.hasNoDefaultLib) {
-                //if (self.program.getRootFileNames().indexOf(sourceFile.fileName) != -1) {
+                // console.error("SOURCE FILE = ", sourceFile.fileName);
+                // if (self.program.getRootFileNames().indexOf(sourceFile.fileName) != -1) {
+                //     console.error("SOURCE FILE2 = ", sourceFile.fileName);
+                // }
                 let fileName: string = path.parse(sourceFile.fileName).name;
                 self.moduleResolver.addModule(fileName, _isExternalModule(sourceFile, self.checker));
             }
@@ -253,6 +256,10 @@ export class ASTTraverse {
         return (node.flags & ts.NodeFlags.Export) != 0;
     }
 
+    private _isInterfaceType(type: ts.Type): boolean {
+        return (type.flags & ts.TypeFlags.Interface) != 0;
+    }
+
     private _isDeclarationIdentifier(id: ts.Identifier): boolean {
         for (const declId of this.allDeclIds) {
             if (declId.getStart() === id.getStart()
@@ -295,30 +302,26 @@ export class ASTTraverse {
                 return fullName ? utils.DefKind.PROPERTY_SIGNATURE : "property_sig";
             case ts.SyntaxKind.MethodSignature:
                 return fullName ? utils.DefKind.METHOD_SIGNATURE : "method_sig";
-            // case ts.SyntaxKind.PropertyAssignment:
-            //     return fullName ? utils.DefKind.PROPERTY_SIGNATURE : "property_sig";
+            case ts.SyntaxKind.PropertyAssignment:
+                return fullName ? utils.DefKind.PROPERTY_SIGNATURE : "property_sig";
         }
     }
 
     private _getScopeNameForDeclaration(decl: ts.Declaration): string {
         switch (decl.kind) {
-            //TODO change names of method, using type from typechecker
             case ts.SyntaxKind.MethodSignature:
             case ts.SyntaxKind.MethodDeclaration:
                 return this._getDeclarationKindName(decl.kind) + "__" + utils.formFnSignatureForPath(decl.getText());
-            //TODO check if it's the best decision
-            // case ts.SyntaxKind.PropertyAssignment:
-            //     return "property_sig" + "__" + (<ts.Identifier>decl.name).text;
             case ts.SyntaxKind.VariableDeclaration:
             case ts.SyntaxKind.ModuleDeclaration:
-                return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text + decl.getStart()
-                    + utils.normalizePath(decl.getSourceFile().fileName);
+                return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text + "__" + decl.getStart()
+                    + "__" + this.program.getSourceFiles().indexOf(decl.getSourceFile());
+            //+ utils.normalizePath(decl.getSourceFile().fileName);
 
             case ts.SyntaxKind.InterfaceDeclaration:
-            //case ts.SyntaxKind.ModuleDeclaration:
             case ts.SyntaxKind.Parameter:
             case ts.SyntaxKind.FunctionDeclaration:
-                return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text + decl.getStart();
+                return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text + "__" + decl.getStart();
             default:
                 return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text;
         }
@@ -341,6 +344,19 @@ export class ASTTraverse {
                     let name = this._getScopeNameForDeclaration(decl);
                     let newChain = utils.formPath(parentChain, name);
                     return this._getScopesChain(node.parent, blockedScope, newChain);
+                }
+            }
+            case ts.SyntaxKind.VariableDeclaration: {
+                let decl = <ts.VariableDeclaration>node;
+                let symbol = this.checker.getSymbolAtLocation(decl.name);
+                if (symbol !== undefined) {
+                    let type = this.checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration);
+                    if (type !== undefined && type.symbol !== undefined && type.symbol.declarations !== undefined) {
+                        let name = this._isInterfaceType(type) ? this._getScopeNameForDeclaration(type.symbol.declarations[0])
+                            : this._getScopeNameForDeclaration(decl);
+                        let newChain = utils.formPath(parentChain, name);
+                        return this._getScopesChain(node.parent, blockedScope, newChain);
+                    }
                 }
             }
             case ts.SyntaxKind.ClassDeclaration:
