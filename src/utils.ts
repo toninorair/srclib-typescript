@@ -1,4 +1,5 @@
 import * as path from "path";
+import * as ts from "typescript";
 
 export class DefKind {
     static CLASS: string = "class";
@@ -15,15 +16,24 @@ export class DefKind {
     static MODULE = "module";
     static IMPORT_VAR = "imported var"
 }
-export function formFnSignatureForPath(sig: string): string {
-    //check whether it is method with implementation
-    if (sig.indexOf('{') !== -1) {
-        sig = sig.substring(0, sig.indexOf('{'));
+export function formFnSignatureForPath(decl: ts.Declaration): string {
+    let resStr = decl.name.getText() + "__";
+    let signDecl = <ts.SignatureDeclaration>decl;
+    for (const param of signDecl.parameters) {
+        resStr = resStr + "__" + param.getText();
     }
+    //add return type here
+    if (signDecl.type !== undefined) {
+        resStr = resStr + signDecl.type.getText();
+    }
+    return replaceSpecialSymbols(resStr);
+}
 
+function replaceSpecialSymbols(sig: string): string {
     return sig.trim().replace(/;\s*/g, "").replace(/:\s*/g, "_").replace(/ \s*/g, "").
         replace(/=>\s*/g, "_").replace(/<\s*/g, "_").replace(/>\s*/g, "_").
-        replace(/\?\s*/g, "_").replace(/\(\s*/g, "_").replace(/\)\s*/g, "_");
+        replace(/\?\s*/g, "_").replace(/\(\s*/g, "_").replace(/\)\s*/g, "_").
+        replace(/\|\s*/g, "_");
 }
 
 export var PATH_SEPARATOR: string = ".";

@@ -310,8 +310,9 @@ export class ASTTraverse {
     private _getScopeNameForDeclaration(decl: ts.Declaration): string {
         switch (decl.kind) {
             case ts.SyntaxKind.MethodSignature:
-            case ts.SyntaxKind.MethodDeclaration:
-                return this._getDeclarationKindName(decl.kind) + "__" + utils.formFnSignatureForPath(decl.getText());
+            case ts.SyntaxKind.MethodDeclaration: {
+                return this._getDeclarationKindName(decl.kind) + "__" + utils.formFnSignatureForPath(decl);
+            }
             case ts.SyntaxKind.VariableDeclaration:
             case ts.SyntaxKind.ModuleDeclaration:
                 return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text + "__" + decl.getStart()
