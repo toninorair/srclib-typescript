@@ -26,10 +26,6 @@ export function formFnSignatureForPath(sig: string): string {
         replace(/\?\s*/g, "_").replace(/\(\s*/g, "_").replace(/\)\s*/g, "_");
 }
 
-export function formTypeSignatureForDoc(type: string): string {
-    return type;
-}
-
 export var PATH_SEPARATOR: string = ".";
 
 export var DATA_DOC_SEPARATOR: string = " ";
@@ -43,6 +39,6 @@ export function formPath(scope: string, element, addToTheEnd: boolean = false): 
 }
 
 export function normalizePath(file: string): string {
-  return path.relative('', file).
-    replace(new RegExp('\\' + path.sep, 'g'), path.posix.sep);
+    return path.relative('', file).
+        replace(new RegExp('\\' + path.sep, 'g'), path.posix.sep);
 }
