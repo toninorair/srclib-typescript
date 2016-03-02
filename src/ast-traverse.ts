@@ -109,19 +109,18 @@ export class ASTTraverse {
 
                 if (!self._isDeclarationIdentifier(id)) {
                     if (symbol !== undefined && symbol.declarations !== undefined) {
-                        //emit ref here
-                        if (symbol.valueDeclaration === undefined) {
-                            console.error("VALUE DECLARATION FOR ID", id.text, "IS UNDEFINED");
-                        }
-                        if (symbol.declarations.length > 1) {
-                            console.error("MORE THAN ONE DECLARATION FOR ID", id.text, "WAS FOUND")
-                        }
-                        //get all possible declarations
+                        // if (symbol.valueDeclaration === undefined) {
+                        //     console.error("VALUE DECLARATION FOR ID", id.text, "IS UNDEFINED");
+                        // }
+                        // if (symbol.declarations.length > 1) {
+                        //     console.error("MORE THAN ONE DECLARATION FOR ID", id.text, "WAS FOUND")
+                        // }
+                        //get all possible declarations and emit refs here
                         for (const decl of symbol.declarations) {
                             self._emitRef(decl, id, self._isBlockedScopeSymbol(symbol));
                         }
                     } else {
-                        console.error("UNDEF SYMBOL", id.text);
+                        console.error("UNDEF SYMBOL", id.text, "IN FILE = ", node.getSourceFile().fileName);
                     }
                 }
             }
@@ -304,6 +303,8 @@ export class ASTTraverse {
                 return fullName ? utils.DefKind.METHOD_SIGNATURE : "method_sig";
             case ts.SyntaxKind.PropertyAssignment:
                 return fullName ? utils.DefKind.PROPERTY_SIGNATURE : "property_sig";
+            default:
+                console.error("UNDEFINED KIND = ", kind);
         }
     }
 
@@ -313,18 +314,19 @@ export class ASTTraverse {
             case ts.SyntaxKind.MethodDeclaration: {
                 return this._getDeclarationKindName(decl.kind) + "__" + utils.formFnSignatureForPath(decl);
             }
-            case ts.SyntaxKind.VariableDeclaration:
-            case ts.SyntaxKind.ModuleDeclaration:
-                return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text + "__" + decl.getStart()
-                    + "__" + this.program.getSourceFiles().indexOf(decl.getSourceFile());
-            //+ utils.normalizePath(decl.getSourceFile().fileName);
-
-            case ts.SyntaxKind.InterfaceDeclaration:
-            case ts.SyntaxKind.Parameter:
-            case ts.SyntaxKind.FunctionDeclaration:
-                return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text + "__" + decl.getStart();
+            // case ts.SyntaxKind.VariableDeclaration:
+            // case ts.SyntaxKind.ModuleDeclaration:
+            //     return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text + "__" + decl.getStart()
+            //         + "__" + this.program.getSourceFiles().indexOf(decl.getSourceFile());
+            // //+ utils.normalizePath(decl.getSourceFile().fileName);
+            //
+            // case ts.SyntaxKind.InterfaceDeclaration:
+            // case ts.SyntaxKind.Parameter:
+            // case ts.SyntaxKind.FunctionDeclaration:
+            //     return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text + "__" + decl.getStart();
             default:
-                return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text;
+                return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text
+                    + decl.getStart() + "__" + this.program.getSourceFiles().indexOf(decl.getSourceFile());
         }
     }
 
