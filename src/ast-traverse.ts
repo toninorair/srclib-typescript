@@ -388,13 +388,13 @@ export class ASTTraverse {
                 let newChain = utils.formPath(parentChain, name);
                 return this._getScopesChain(node.parent, blockedScope, newChain);
             }
-            case ts.SyntaxKind.Block: {
-                if (blockedScope) {
-                    let decl = <ts.Block>node;
-                    let newChain = utils.formPath(parentChain, decl.getStart());
-                    return this._getScopesChain(node.parent, blockedScope, newChain);
-                }
-            }
+            // case ts.SyntaxKind.Block: {
+            //     if (blockedScope) {
+            //         let decl = <ts.Block>node;
+            //         let newChain = utils.formPath(parentChain, decl.getStart());
+            //         return this._getScopesChain(node.parent, blockedScope, newChain);
+            //     }
+            // }
             default:
                 return this._getScopesChain(node.parent, blockedScope, parentChain);
         }
