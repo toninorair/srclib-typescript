@@ -117,7 +117,7 @@ export class ASTTraverse {
                         // }
                         //get all possible declarations and emit refs here
                         for (const decl of symbol.declarations) {
-                            self._emitRef(decl, id, self._isBlockedScopeSymbol(symbol));
+                            self._emitRef(decl, id);
                         }
                     } else {
                         console.error("UNDEF SYMBOL", id.text, "IN FILE = ", node.getSourceFile().fileName);
@@ -167,7 +167,7 @@ export class ASTTraverse {
                     }
 
                     //emit def here
-                    self._emitDef(decl, self._isBlockedScopeSymbol(symbol));
+                    self._emitDef(decl);
                     break;
                 }
                 case ts.SyntaxKind.SetAccessor:
@@ -200,7 +200,7 @@ export class ASTTraverse {
         }
     }
 
-    private _emitDef(decl: ts.Declaration, blockedScope: boolean = false) {
+    private _emitDef(decl: ts.Declaration) {
         //emitting def here
         var def: defs.Def = new defs.Def();
         var id: ts.Identifier = <ts.Identifier>decl.name;
@@ -217,7 +217,7 @@ export class ASTTraverse {
         def.Data.Separator = utils.DATA_DOC_SEPARATOR;
 
         //def.Path = this.checker.getFullyQualifiedName(symbol);
-        var scopeRes: string = this._getScopesChain(decl.parent, blockedScope);
+        var scopeRes: string = this._getScopesChain(decl.parent);
         var declNameInScope: string = this._getScopeNameForDeclaration(decl);
         def.Path = utils.formPath(scopeRes, declNameInScope, true);
         def.TreePath = def.Path;
@@ -228,16 +228,16 @@ export class ASTTraverse {
         this.allObjects.Defs.push(def);
 
         //emit special ref with Def field set into true
-        this._emitRef(decl, id, blockedScope, true);
+        this._emitRef(decl, id, true);
         // console.error(JSON.stringify(def));
         // console.error("-------------------");
     }
 
     //now declaration is provided as node here
-    private _emitRef(decl: ts.Declaration, id: ts.Identifier, blockedScope: boolean = false, definitionRef: boolean = false) {
+    private _emitRef(decl: ts.Declaration, id: ts.Identifier, definitionRef: boolean = false) {
         //emitting ref here
         var ref: defs.Ref = new defs.Ref();
-        var scopeRes: string = this._getScopesChain(decl.parent, blockedScope);
+        var scopeRes: string = this._getScopesChain(decl.parent);
         var declNameInScope: string = this._getScopeNameForDeclaration(decl);
         ref.DefPath = utils.formPath(scopeRes, declNameInScope, true);
         ref.File = utils.normalizePath(id.getSourceFile().fileName);
@@ -343,7 +343,7 @@ export class ASTTraverse {
         }
     }
 
-    private _getScopesChain(node: ts.Node, blockedScope: boolean, parentChain: string = ""): string {
+    private _getScopesChain(node: ts.Node, parentChain: string = ""): string {
         if (node.kind === ts.SyntaxKind.SourceFile) {
             let fileName: string = path.parse(node.getSourceFile().fileName).name;
             let moduleName: string = this.moduleResolver.getModule(fileName);
@@ -359,7 +359,7 @@ export class ASTTraverse {
                 } else {
                     let name = this._getScopeNameForDeclaration(decl);
                     let newChain = utils.formPath(parentChain, name);
-                    return this._getScopesChain(node.parent, blockedScope, newChain);
+                    return this._getScopesChain(node.parent, newChain);
                 }
             }
             case ts.SyntaxKind.VariableDeclaration: {
@@ -371,7 +371,7 @@ export class ASTTraverse {
                         let name = this._isInterfaceType(type) ? this._getScopeNameForDeclaration(type.symbol.declarations[0])
                             : this._getScopeNameForDeclaration(decl);
                         let newChain = utils.formPath(parentChain, name);
-                        return this._getScopesChain(node.parent, blockedScope, newChain);
+                        return this._getScopesChain(node.parent, newChain);
                     }
                 }
             }
@@ -386,17 +386,10 @@ export class ASTTraverse {
                 let decl = <ts.Declaration>node;
                 let name = this._getScopeNameForDeclaration(decl);
                 let newChain = utils.formPath(parentChain, name);
-                return this._getScopesChain(node.parent, blockedScope, newChain);
+                return this._getScopesChain(node.parent, newChain);
             }
-            // case ts.SyntaxKind.Block: {
-            //     if (blockedScope) {
-            //         let decl = <ts.Block>node;
-            //         let newChain = utils.formPath(parentChain, decl.getStart());
-            //         return this._getScopesChain(node.parent, blockedScope, newChain);
-            //     }
-            // }
             default:
-                return this._getScopesChain(node.parent, blockedScope, parentChain);
+                return this._getScopesChain(node.parent, parentChain);
         }
     }
 }
