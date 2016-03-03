@@ -186,6 +186,7 @@ export class ASTTraverse {
                 case ts.SyntaxKind.PropertySignature:
                 case ts.SyntaxKind.TypeAliasDeclaration:
                 case ts.SyntaxKind.MethodSignature:
+                case ts.SyntaxKind.ShorthandPropertyAssignment:
                 case ts.SyntaxKind.ExportSpecifier:
                     let decl = <ts.Declaration>node;
                     self.allDeclIds.push(<ts.Identifier>decl.name);
@@ -288,6 +289,7 @@ export class ASTTraverse {
                 return fullName ? utils.DefKind.FUNC : "func";
             case ts.SyntaxKind.MethodDeclaration:
                 return fullName ? utils.DefKind.METHOD : "method";
+            case ts.SyntaxKind.ShorthandPropertyAssignment:
             case ts.SyntaxKind.VariableDeclaration:
                 return fullName ? utils.DefKind.VAR : "var";
             case ts.SyntaxKind.ImportEqualsDeclaration:
