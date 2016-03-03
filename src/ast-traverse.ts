@@ -184,14 +184,13 @@ export class ASTTraverse {
                 case ts.SyntaxKind.PropertySignature:
                 case ts.SyntaxKind.TypeAliasDeclaration:
                 case ts.SyntaxKind.MethodSignature:
+                case ts.SyntaxKind.ExportSpecifier:
                     let decl = <ts.Declaration>node;
                     self.allDeclIds.push(<ts.Identifier>decl.name);
 
                     //emit def here
                     self._emitDef(decl);
                     break;
-
-
             }
             ts.forEachChild(node, _collectDefs);
         }
@@ -310,6 +309,8 @@ export class ASTTraverse {
                 return fullName ? utils.DefKind.PROPERTY_SIGNATURE : "property_sig";
             case ts.SyntaxKind.TypeAliasDeclaration:
                 return fullName ? utils.DefKind.TYPE_ALIAS : "type_alias";
+            case ts.SyntaxKind.ExportSpecifier:
+                return fullName ? utils.DefKind.EXPORT_SPECIFIER : "exported_name";
             default:
                 console.error("UNDEFINED KIND = ", kind);
         }
@@ -325,8 +326,8 @@ export class ASTTraverse {
                 if (this._getDeclarationKindName(decl.kind) === undefined) {
                     console.error("UNDEFINED KIND FOR DECL = ", decl.getText(), "IN SRC FILE = ", decl.getSourceFile().fileName);
                 }
-                return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text
-                    + decl.getStart() + "__" + this.program.getSourceFiles().indexOf(decl.getSourceFile());
+                return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text +
+                    "__" + decl.getStart() + "__" + this.program.getSourceFiles().indexOf(decl.getSourceFile());
         }
     }
 

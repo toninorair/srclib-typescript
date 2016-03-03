@@ -16,7 +16,8 @@ export class DefKind {
     static MODULE = "module";
     static IMPORT_VAR = "imported var";
     static TYPE_ALIAS = "type alias";
-    static TYPE_PARAM = "type parameter"
+    static TYPE_PARAM = "type parameter";
+    static EXPORT_SPECIFIER = "exported name";
 }
 
 export function formFnSignatureForPath(decl: ts.Declaration): string {
