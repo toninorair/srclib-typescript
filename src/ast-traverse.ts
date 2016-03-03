@@ -332,7 +332,8 @@ export class ASTTraverse {
         switch (decl.kind) {
             case ts.SyntaxKind.MethodSignature:
             case ts.SyntaxKind.MethodDeclaration: {
-                return this._getDeclarationKindName(decl.kind) + "__" + utils.formFnSignatureForPath(decl);
+                return this._getDeclarationKindName(decl.kind) + "__" + utils.formFnSignatureForPath(decl) +
+                    "__" + decl.getStart() + "__" + this.program.getSourceFiles().indexOf(decl.getSourceFile());
             }
             default:
                 if (this._getDeclarationKindName(decl.kind) === undefined) {
