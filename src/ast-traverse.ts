@@ -177,6 +177,7 @@ export class ASTTraverse {
                 case ts.SyntaxKind.MethodDeclaration:
                 case ts.SyntaxKind.ImportEqualsDeclaration:
                 case ts.SyntaxKind.Parameter:
+                case ts.SyntaxKind.TypeParameter:
                 case ts.SyntaxKind.EnumMember:
                 case ts.SyntaxKind.PropertyDeclaration:
                 //FOR INTERFACES
@@ -294,6 +295,8 @@ export class ASTTraverse {
                 return fullName ? utils.DefKind.IMPORT_VAR : "import_var";
             case ts.SyntaxKind.Parameter:
                 return fullName ? utils.DefKind.PARAM : "param";
+            case ts.SyntaxKind.TypeParameter:
+                return fullName ? utils.DefKind.TYPE_PARAM : "type_param";
             case ts.SyntaxKind.EnumMember:
                 return fullName ? utils.DefKind.ENUM_MEMBER : "enum_val";
             case ts.SyntaxKind.PropertyDeclaration:

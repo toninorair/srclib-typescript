@@ -6,7 +6,7 @@ export class DefKind {
     static FUNC: string = "function";
     static METHOD: string = "method";
     static VAR: string = "var";
-    static PARAM: string = "param";
+    static PARAM: string = "paramater";
     static FIELD: string = "property";
     static INTERFACE: string = "interface";
     static ENUM: string = "enum";
@@ -16,6 +16,7 @@ export class DefKind {
     static MODULE = "module";
     static IMPORT_VAR = "imported var";
     static TYPE_ALIAS = "type alias";
+    static TYPE_PARAM = "type parameter"
 }
 
 export function formFnSignatureForPath(decl: ts.Declaration): string {
