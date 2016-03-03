@@ -18,6 +18,8 @@ export class DefKind {
     static TYPE_ALIAS = "type alias";
     static TYPE_PARAM = "type parameter";
     static EXPORT_SPECIFIER = "exported name";
+    static GET_ACCESSOR = "get accessor";
+    static SET_ACCESSOR = "set accessor";
 }
 
 export function formFnSignatureForPath(decl: ts.Declaration): string {

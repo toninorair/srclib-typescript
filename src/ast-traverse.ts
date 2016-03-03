@@ -170,6 +170,8 @@ export class ASTTraverse {
                     self._emitDef(decl, self._isBlockedScopeSymbol(symbol));
                     break;
                 }
+                case ts.SyntaxKind.SetAccessor:
+                case ts.SyntaxKind.GetAccessor:
                 case ts.SyntaxKind.ClassDeclaration:
                 case ts.SyntaxKind.InterfaceDeclaration:
                 case ts.SyntaxKind.EnumDeclaration:
@@ -311,6 +313,10 @@ export class ASTTraverse {
                 return fullName ? utils.DefKind.TYPE_ALIAS : "type_alias";
             case ts.SyntaxKind.ExportSpecifier:
                 return fullName ? utils.DefKind.EXPORT_SPECIFIER : "exported_name";
+            case ts.SyntaxKind.GetAccessor:
+                return fullName ? utils.DefKind.GET_ACCESSOR : "get_accessor";
+            case ts.SyntaxKind.SetAccessor:
+                return fullName ? utils.DefKind.SET_ACCESSOR : "set_accessor";
             default:
                 console.error("UNDEFINED KIND = ", kind);
         }
