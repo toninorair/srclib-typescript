@@ -157,25 +157,6 @@ export class ASTTraverse {
                     }
                     break;
                 }
-                case ts.SyntaxKind.ClassDeclaration:
-                case ts.SyntaxKind.InterfaceDeclaration:
-                case ts.SyntaxKind.EnumDeclaration:
-                case ts.SyntaxKind.FunctionDeclaration:
-                case ts.SyntaxKind.MethodDeclaration:
-                case ts.SyntaxKind.ImportEqualsDeclaration:
-                case ts.SyntaxKind.Parameter:
-                case ts.SyntaxKind.EnumMember:
-                case ts.SyntaxKind.PropertyDeclaration:
-                //FOR INTERFACES
-                case ts.SyntaxKind.PropertySignature:
-                case ts.SyntaxKind.MethodSignature:
-                    let decl = <ts.Declaration>node;
-                    self.allDeclIds.push(<ts.Identifier>decl.name);
-
-                    //emit def here
-                    self._emitDef(decl);
-                    break;
-
                 case ts.SyntaxKind.VariableDeclaration: {
                     let decl = <ts.VariableDeclaration>node;
                     self.allDeclIds.push(<ts.Identifier>decl.name);
@@ -189,6 +170,27 @@ export class ASTTraverse {
                     self._emitDef(decl, self._isBlockedScopeSymbol(symbol));
                     break;
                 }
+                case ts.SyntaxKind.ClassDeclaration:
+                case ts.SyntaxKind.InterfaceDeclaration:
+                case ts.SyntaxKind.EnumDeclaration:
+                case ts.SyntaxKind.FunctionDeclaration:
+                case ts.SyntaxKind.MethodDeclaration:
+                case ts.SyntaxKind.ImportEqualsDeclaration:
+                case ts.SyntaxKind.Parameter:
+                case ts.SyntaxKind.EnumMember:
+                case ts.SyntaxKind.PropertyDeclaration:
+                //FOR INTERFACES
+                case ts.SyntaxKind.PropertySignature:
+                case ts.SyntaxKind.TypeAliasDeclaration:
+                case ts.SyntaxKind.MethodSignature:
+                    let decl = <ts.Declaration>node;
+                    self.allDeclIds.push(<ts.Identifier>decl.name);
+
+                    //emit def here
+                    self._emitDef(decl);
+                    break;
+
+
             }
             ts.forEachChild(node, _collectDefs);
         }
@@ -303,6 +305,8 @@ export class ASTTraverse {
                 return fullName ? utils.DefKind.METHOD_SIGNATURE : "method_sig";
             case ts.SyntaxKind.PropertyAssignment:
                 return fullName ? utils.DefKind.PROPERTY_SIGNATURE : "property_sig";
+            case ts.SyntaxKind.TypeAliasDeclaration:
+                return fullName ? utils.DefKind.TYPE_ALIAS : "type_alias";
             default:
                 console.error("UNDEFINED KIND = ", kind);
         }
@@ -314,17 +318,10 @@ export class ASTTraverse {
             case ts.SyntaxKind.MethodDeclaration: {
                 return this._getDeclarationKindName(decl.kind) + "__" + utils.formFnSignatureForPath(decl);
             }
-            // case ts.SyntaxKind.VariableDeclaration:
-            // case ts.SyntaxKind.ModuleDeclaration:
-            //     return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text + "__" + decl.getStart()
-            //         + "__" + this.program.getSourceFiles().indexOf(decl.getSourceFile());
-            // //+ utils.normalizePath(decl.getSourceFile().fileName);
-            //
-            // case ts.SyntaxKind.InterfaceDeclaration:
-            // case ts.SyntaxKind.Parameter:
-            // case ts.SyntaxKind.FunctionDeclaration:
-            //     return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text + "__" + decl.getStart();
             default:
+                if (this._getDeclarationKindName(decl.kind) === undefined) {
+                    console.error("UNDEFINED KIND FOR DECL = ", decl.getText(), "IN SRC FILE = ", decl.getSourceFile().fileName);
+                }
                 return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text
                     + decl.getStart() + "__" + this.program.getSourceFiles().indexOf(decl.getSourceFile());
         }

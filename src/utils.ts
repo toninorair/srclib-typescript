@@ -14,8 +14,10 @@ export class DefKind {
     static PROPERTY_SIGNATURE = "property signature";
     static METHOD_SIGNATURE = "method signature";
     static MODULE = "module";
-    static IMPORT_VAR = "imported var"
+    static IMPORT_VAR = "imported var";
+    static TYPE_ALIAS = "type alias";
 }
+
 export function formFnSignatureForPath(decl: ts.Declaration): string {
     let resStr = decl.name.getText() + "__";
     let signDecl = <ts.SignatureDeclaration>decl;
