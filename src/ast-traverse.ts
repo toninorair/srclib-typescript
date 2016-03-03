@@ -162,7 +162,7 @@ export class ASTTraverse {
                     self.allDeclIds.push(<ts.Identifier>decl.name);
                     let symbol = self.checker.getSymbolAtLocation(decl.name);
                     if (symbol === undefined) {
-                        console.error("UNDEFINED SYMBOL IN VAR DECL");
+                        console.error("UNDEFINED SYMBOL IN VAR DECL", decl.getText());
                         break;
                     }
 
@@ -188,6 +188,7 @@ export class ASTTraverse {
                 case ts.SyntaxKind.MethodSignature:
                 case ts.SyntaxKind.ShorthandPropertyAssignment:
                 case ts.SyntaxKind.ExportSpecifier:
+                case ts.SyntaxKind.BindingElement:
                     let decl = <ts.Declaration>node;
                     self.allDeclIds.push(<ts.Identifier>decl.name);
 
@@ -289,7 +290,6 @@ export class ASTTraverse {
                 return fullName ? utils.DefKind.FUNC : "func";
             case ts.SyntaxKind.MethodDeclaration:
                 return fullName ? utils.DefKind.METHOD : "method";
-            case ts.SyntaxKind.ShorthandPropertyAssignment:
             case ts.SyntaxKind.VariableDeclaration:
                 return fullName ? utils.DefKind.VAR : "var";
             case ts.SyntaxKind.ImportEqualsDeclaration:
@@ -319,6 +319,10 @@ export class ASTTraverse {
                 return fullName ? utils.DefKind.GET_ACCESSOR : "get_accessor";
             case ts.SyntaxKind.SetAccessor:
                 return fullName ? utils.DefKind.SET_ACCESSOR : "set_accessor";
+            case ts.SyntaxKind.ShorthandPropertyAssignment:
+                return fullName ? "prop_assign" : "prop_assign";
+            case ts.SyntaxKind.BindingElement:
+                return fullName ? "binding_element" : "binding_element";
             default:
                 console.error("UNDEFINED KIND = ", kind);
         }
