@@ -133,8 +133,13 @@ export class ASTTraverse {
             switch (node.kind) {
                 case ts.SyntaxKind.ModuleDeclaration: {
                     let decl = <ts.Declaration>node;
-                    self.allDeclIds.push(<ts.Identifier>decl.name);
-                    break;
+                    if (decl.name !== undefined && decl.name.kind === ts.SyntaxKind.Identifier) {
+                        self.allDeclIds.push(<ts.Identifier>decl.name);
+                        break;
+                    } else {
+                        console.error("UNDEFINED NAME or NAME IS NOT IDENTIFIER!!!!");
+                        break;
+                    }
                 }
                 case ts.SyntaxKind.ImportDeclaration: {
                     let decl = <ts.ImportDeclaration>node;
@@ -161,16 +166,21 @@ export class ASTTraverse {
                 }
                 case ts.SyntaxKind.VariableDeclaration: {
                     let decl = <ts.VariableDeclaration>node;
-                    self.allDeclIds.push(<ts.Identifier>decl.name);
-                    let symbol = self.checker.getSymbolAtLocation(decl.name);
-                    if (symbol === undefined) {
-                        console.error("UNDEFINED SYMBOL IN VAR DECL", decl.getText());
+                    if (decl.name !== undefined && decl.name.kind === ts.SyntaxKind.Identifier) {
+                        self.allDeclIds.push(<ts.Identifier>decl.name);
+                        let symbol = self.checker.getSymbolAtLocation(decl.name);
+                        if (symbol === undefined) {
+                            console.error("UNDEFINED SYMBOL IN VAR DECL", decl.getText());
+                            break;
+                        }
+
+                        //emit def here
+                        self._emitDef(decl);
+                        break;
+                    } else {
+                        console.error("UNDEFINED NAME or NAME IS NOT IDENTIFIER!!!!");
                         break;
                     }
-
-                    //emit def here
-                    self._emitDef(decl);
-                    break;
                 }
                 case ts.SyntaxKind.SetAccessor:
                 case ts.SyntaxKind.GetAccessor:
@@ -192,11 +202,16 @@ export class ASTTraverse {
                 case ts.SyntaxKind.ExportSpecifier:
                 case ts.SyntaxKind.BindingElement:
                     let decl = <ts.Declaration>node;
-                    self.allDeclIds.push(<ts.Identifier>decl.name);
+                    if (decl.name !== undefined && decl.name.kind === ts.SyntaxKind.Identifier) {
+                        self.allDeclIds.push(<ts.Identifier>decl.name);
 
-                    //emit def here
-                    self._emitDef(decl);
-                    break;
+                        //emit def here
+                        self._emitDef(decl);
+                        break;
+                    } else {
+                        console.error("UNDEFINED NAME or NAME IS NOT IDENTIFIER!!!!");
+                        break;
+                    }
             }
             ts.forEachChild(node, _collectDefs);
         }
@@ -341,8 +356,14 @@ export class ASTTraverse {
                 if (this._getDeclarationKindName(decl.kind) === undefined) {
                     console.error("UNDEFINED KIND FOR DECL = ", decl.getText(), "IN SRC FILE = ", decl.getSourceFile().fileName);
                 }
-                return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text +
-                    "__" + decl.getStart() + "__" + this.program.getSourceFiles().indexOf(decl.getSourceFile());
+                if (decl.name !== undefined && decl.name.kind === ts.SyntaxKind.Identifier) {
+                    return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text +
+                        "__" + decl.getStart() + "__" + this.program.getSourceFiles().indexOf(decl.getSourceFile());
+                } else {
+                    console.error("UNDEFINED NAME or NAME IS NOT IDENTIFIER!!!!");
+                    return this._getDeclarationKindName(decl.kind) +
+                        "__" + decl.getStart() + "__" + this.program.getSourceFiles().indexOf(decl.getSourceFile());
+                }
         }
     }
 
@@ -365,19 +386,7 @@ export class ASTTraverse {
                     return this._getScopesChain(node.parent, newChain);
                 }
             }
-            case ts.SyntaxKind.VariableDeclaration: {
-                let decl = <ts.VariableDeclaration>node;
-                let symbol = this.checker.getSymbolAtLocation(decl.name);
-                if (symbol !== undefined) {
-                    let type = this.checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration);
-                    if (type !== undefined && type.symbol !== undefined && type.symbol.declarations !== undefined) {
-                        let name = this._isInterfaceType(type) ? this._getScopeNameForDeclaration(type.symbol.declarations[0])
-                            : this._getScopeNameForDeclaration(decl);
-                        let newChain = utils.formPath(parentChain, name);
-                        return this._getScopesChain(node.parent, newChain);
-                    }
-                }
-            }
+            case ts.SyntaxKind.VariableDeclaration:
             case ts.SyntaxKind.ClassDeclaration:
             case ts.SyntaxKind.InterfaceDeclaration:
             case ts.SyntaxKind.EnumDeclaration:
