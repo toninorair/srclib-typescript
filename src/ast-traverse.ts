@@ -117,7 +117,9 @@ export class ASTTraverse {
                         // }
                         //get all possible declarations and emit refs here
                         for (const decl of symbol.declarations) {
-                            self._emitRef(decl, id);
+                            if (decl.kind !== ts.SyntaxKind.SourceFile) {
+                                self._emitRef(decl, id);
+                            }
                         }
                     } else {
                         console.error("UNDEF SYMBOL", id.text, "IN FILE = ", node.getSourceFile().fileName);
