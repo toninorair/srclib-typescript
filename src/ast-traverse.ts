@@ -178,7 +178,7 @@ export class ASTTraverse {
                         self._emitDef(decl);
                         break;
                     } else {
-                        console.error("UNDEFINED NAME or NAME IS NOT IDENTIFIER!!!!");
+                        console.error("UNDEFINED NAME or NAME IS NOT IDENTIFIER!!!! for decl", decl.getText());
                         break;
                     }
                 }
