@@ -132,14 +132,9 @@ export class ASTTraverse {
         function _collectDefs(node: ts.Node) {
             switch (node.kind) {
                 case ts.SyntaxKind.ModuleDeclaration: {
-                    let decl = <ts.Declaration>node;
-                    if (decl.name !== undefined && decl.name.kind === ts.SyntaxKind.Identifier) {
-                        self.allDeclIds.push(<ts.Identifier>decl.name);
-                        break;
-                    } else {
-                        console.error("UNDEFINED NAME or NAME IS NOT IDENTIFIER!!!!");
-                        break;
-                    }
+                    let decl = <ts.ModuleDeclaration>node;
+                    self._addDeclarationIdentifier(decl);
+                    break;
                 }
                 case ts.SyntaxKind.ImportDeclaration: {
                     let decl = <ts.ImportDeclaration>node;
@@ -147,7 +142,7 @@ export class ASTTraverse {
                         let namedBindings = decl.importClause.namedBindings;
                         if (namedBindings.kind === ts.SyntaxKind.NamespaceImport) {
                             let namespaceImport = <ts.NamespaceImport>namedBindings;
-                            self.allDeclIds.push(<ts.Identifier>namespaceImport.name);
+                            self._addDeclarationIdentifier(namespaceImport);
 
                             //emit def here
                             self._emitDef(namespaceImport);
@@ -155,7 +150,7 @@ export class ASTTraverse {
                         } else if (namedBindings.kind === ts.SyntaxKind.NamedImports) {
                             let namedImports = <ts.NamedImports>namedBindings;
                             for (const namedImport of namedImports.elements) {
-                                self.allDeclIds.push(<ts.Identifier>namedImport.name);
+                                self._addDeclarationIdentifier(namedImport);
 
                                 //emit def here
                                 self._emitDef(namedImport);
@@ -166,21 +161,16 @@ export class ASTTraverse {
                 }
                 case ts.SyntaxKind.VariableDeclaration: {
                     let decl = <ts.VariableDeclaration>node;
-                    if (decl.name !== undefined && decl.name.kind === ts.SyntaxKind.Identifier) {
-                        self.allDeclIds.push(<ts.Identifier>decl.name);
-                        let symbol = self.checker.getSymbolAtLocation(decl.name);
-                        if (symbol === undefined) {
-                            console.error("UNDEFINED SYMBOL IN VAR DECL", decl.getText());
-                            break;
-                        }
-
-                        //emit def here
-                        self._emitDef(decl);
-                        break;
-                    } else {
-                        console.error("UNDEFINED NAME or NAME IS NOT IDENTIFIER!!!! for decl", decl.getText());
+                    self._addDeclarationIdentifier(decl);
+                    let symbol = self.checker.getSymbolAtLocation(decl.name);
+                    if (symbol === undefined) {
+                        console.error("UNDEFINED SYMBOL IN VAR DECL", decl.getText());
                         break;
                     }
+
+                    //emit def here
+                    self._emitDef(decl);
+                    break;
                 }
                 case ts.SyntaxKind.SetAccessor:
                 case ts.SyntaxKind.GetAccessor:
@@ -195,29 +185,28 @@ export class ASTTraverse {
                 case ts.SyntaxKind.EnumMember:
                 case ts.SyntaxKind.PropertyDeclaration:
                 //FOR INTERFACES
-                case ts.SyntaxKind.PropertySignature:
+                //case ts.SyntaxKind.PropertySignature:
                 case ts.SyntaxKind.TypeAliasDeclaration:
                 case ts.SyntaxKind.MethodSignature:
                 case ts.SyntaxKind.ShorthandPropertyAssignment:
                 case ts.SyntaxKind.ExportSpecifier:
                 case ts.SyntaxKind.BindingElement:
                     let decl = <ts.Declaration>node;
-                    if (decl.name !== undefined && decl.name.kind === ts.SyntaxKind.Identifier) {
-                        self.allDeclIds.push(<ts.Identifier>decl.name);
-
-                        //emit def here
-                        self._emitDef(decl);
-                        break;
-                    } else {
-                        console.error("UNDEFINED NAME or NAME IS NOT IDENTIFIER!!!!");
-                        break;
-                    }
+                    self._addDeclarationIdentifier(decl);
+                    //emit def here
+                    self._emitDef(decl);
+                    break;
             }
             ts.forEachChild(node, _collectDefs);
         }
     }
 
     private _emitDef(decl: ts.Declaration) {
+        if (decl.name === undefined || decl.name.kind !== ts.SyntaxKind.Identifier) {
+            console.error("Cannot emit declaration, declaration name is absent or is not identifier", decl.getText());
+            return;
+        }
+
         //emitting def here
         var def: defs.Def = new defs.Def();
         var id: ts.Identifier = <ts.Identifier>decl.name;
@@ -280,6 +269,14 @@ export class ASTTraverse {
 
     private _isInterfaceType(type: ts.Type): boolean {
         return (type.flags & ts.TypeFlags.Interface) != 0;
+    }
+
+    private _addDeclarationIdentifier(decl: ts.Declaration): void {
+        if (decl.name !== undefined && decl.name.kind === ts.SyntaxKind.Identifier) {
+            this.allDeclIds.push(<ts.Identifier>decl.name);
+        } else {
+            //console.error("Cannot add declaration, declaration name is absent or is not identifier", decl.getText());
+        }
     }
 
     private _isDeclarationIdentifier(id: ts.Identifier): boolean {
@@ -360,7 +357,7 @@ export class ASTTraverse {
                     return this._getDeclarationKindName(decl.kind) + "__" + (<ts.Identifier>decl.name).text +
                         "__" + decl.getStart() + "__" + this.program.getSourceFiles().indexOf(decl.getSourceFile());
                 } else {
-                    console.error("UNDEFINED NAME or NAME IS NOT IDENTIFIER!!!!");
+                    console.error("UNDEFINED NAME or NAME IS NOT IDENTIFIER!!!!", decl.getText());
                     return this._getDeclarationKindName(decl.kind) +
                         "__" + decl.getStart() + "__" + this.program.getSourceFiles().indexOf(decl.getSourceFile());
                 }
