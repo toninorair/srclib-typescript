@@ -130,6 +130,9 @@ export class ASTTraverse {
         }
 
         function _collectDefs(node: ts.Node) {
+            if (node.kind === ts.SyntaxKind.JSDocComment) {
+                console.error("Hello here with", node.getText());
+            }
             switch (node.kind) {
                 case ts.SyntaxKind.ModuleDeclaration: {
                     let decl = <ts.ModuleDeclaration>node;
@@ -211,16 +214,6 @@ export class ASTTraverse {
         var def: defs.Def = new defs.Def();
         var id: ts.Identifier = <ts.Identifier>decl.name;
         def.Name = id.text;
-        let symbol = this.checker.getSymbolAtLocation(decl.name);
-
-        //fill data field
-        def.Data = new defs.Data();
-        if (symbol !== undefined) {
-            def.Data.Type = this.checker.typeToString(this.checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration));
-        }
-        def.Data.Keyword = this._getDeclarationKindName(decl.kind);
-        def.Data.Kind = this._getDeclarationKindName(decl.kind, true);
-        def.Data.Separator = utils.DATA_DOC_SEPARATOR;
 
         //def.Path = this.checker.getFullyQualifiedName(symbol);
         var scopeRes: string = this._getScopesChain(decl.parent);
@@ -231,6 +224,31 @@ export class ASTTraverse {
         def.File = utils.normalizePath(decl.getSourceFile().fileName);
         def.DefStart = id.getStart();
         def.DefEnd = id.getEnd();
+
+
+        //fill data field and comments
+        let symbol = this.checker.getSymbolAtLocation(decl.name);
+        def.Data = new defs.Data();
+        if (symbol !== undefined) {
+            def.Data.Type = this.checker.typeToString(this.checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration));
+            var comments = symbol.getDocumentationComment();
+            if (comments.length > 0) {
+                var docRes = "";
+                for (const comment of comments) {
+                    docRes += comment.text + " ";
+                }
+                var doc: defs.Doc = new defs.Doc();
+                doc.Path = def.Path;
+                doc.Format = "";
+                doc.Data = docRes.trim();
+                this.allObjects.Docs.push(doc);
+            }
+        }
+
+        def.Data.Keyword = this._getDeclarationKindName(decl.kind);
+        def.Data.Kind = this._getDeclarationKindName(decl.kind, true);
+        def.Data.Separator = utils.DATA_DOC_SEPARATOR;
+
         this.allObjects.Defs.push(def);
 
         //emit special ref with Def field set into true

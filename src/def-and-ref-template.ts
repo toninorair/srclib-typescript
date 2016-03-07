@@ -24,11 +24,19 @@ export class Ref {
     End: number;
 }
 
+export class Doc {
+    Path: string;
+    Format: string;
+    Data: string;
+}
+
 export class RootObject {
     constructor() {
         this.Defs = new Array<Def>();
         this.Refs = new Array<Ref>();
+        this.Docs = new Array<Doc>();
     }
     Defs: Array<Def>;
     Refs: Array<Ref>;
+    Docs: Array<Doc>;
 }
