@@ -22,38 +22,38 @@ src toolchain list
 You should see this srclib-typescript toolchain in the list.
 Now that this toolchain is installed, any program that relies on srclib will support TypeScript.
 (TODO(sqs): add a tutorial link)
-## Testa and known issues
+## Tests and known issues
 srclib-typescript is alpha-quality software. It powers code analysis on
 [Sourcegraph.com](https://sourcegraph.com) and additionally has been tested on the next typescript repositories:
 Successfully:
-*n3-charts/line-chart 
-*palantir/plottable 
-*SierraSoftworks/Iridium 
-*valor-software/ng2-bootstrap 
-*DefinitelyTyped/tsd
-*Microsoft/code-push
-*Microsoft/TypeScriptSamples
-*mgechev/angular2-seed
-*Microsoft/vscode-go
-*ng-book/angular2-rxjs-chat
-*auth0/angular2-authentication-sample
-*NativeScript/nativescript-cli
-*uProxy/uproxy
-*rogerpadilla/angular2-minimalist-starter
-*rangle/batarangle
-*VSCodeVim/Vim
-*ngUpgraders/ng-forward
+* [n3-charts/line-chart](https://github.com/n3-charts/line-chart) 
+* [palantir/plottable](https://github.com/palantir/plottable)
+* [SierraSoftworks/Iridium](https://github.com/SierraSoftworks/Iridium)
+* [valor-software/ng2-bootstrap](https://github.com/valor-software/ng2-bootstrap) 
+* [DefinitelyTyped/tsd](https://github.com/DefinitelyTyped/tsd)
+* [Microsoft/code-push](https://github.com/Microsoft/code-push)
+* [Microsoft/TypeScriptSamples](https://github.com/Microsoft/TypeScriptSamples)
+* [mgechev/angular2-seed](https://github.com/mgechev/angular2-seed)
+* [Microsoft/vscode-go](https://github.com/Microsoft/vscode-go)
+* [ng-book/angular2-rxjs-chat](https://github.com/ng-book/angular2-rxjs-chat)
+* [auth0/angular2-authentication-sample](https://github.com/auth0/angular2-authentication-sample)
+* [NativeScript/nativescript-cli](https://github.com/NativeScript/nativescript-cli)
+* [uProxy/uproxy](https://github.com/uProxy/uproxy)
+* [rogerpadilla/angular2-minimalist-starter](https://github.com/rogerpadilla/angular2-minimalist-starter)
+* [rangle/batarangle](https://github.com/rangle/batarangle)
+* [VSCodeVim/Vim](https://github.com/VSCodeVim/Vim)
+* [ngUpgraders/ng-forward](https://github.com/ngUpgraders/ng-forward)
 
 With issues:
-*plasma-umass/doppio 
-*vega/vega-lite - fails, one duplicate Ref
+* [plasma-umass/doppio](https://github.com/plasma-umass/doppio) 
+* [vega/vega-lite](https://github.com/vega/vega-lite) - fails, one duplicate Ref
 Next issues were found:
 1. Unsupported builtins for interfaces
 2. Partially supported shorthand property assignments
 3. ExportSpecifiers can work better
 4. Import clause not fully supported (syntax tree kind = 226)
 
-## Test procedure
+## Run procedure
 Testing this toolchain requires that you have installed `src` from
 [srclib](https://sourcegraph.com/sourcegraph/srclib) and that you have this
 toolchain set up. See srclib documentation for more information.
@@ -72,8 +72,3 @@ execution methods.
 Patches are welcomed via GitHub pull request! See
 [CONTRIBUTING.md](./CONTRIBUTING.md) for more information.
 srclib-typescript's toolchain solution is based on [Typescript AST compiler api](https://github.com/Microsoft/TypeScript/wiki/Using-the-Compiler-API).
-Powered by Sourcegraph
-Code Intelligence for teams
-version 
-
-
