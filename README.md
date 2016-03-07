@@ -28,7 +28,8 @@ Now that this toolchain is installed, any program that relies on srclib will sup
 
 ## Tests and known issues
 srclib-typescript is alpha-quality software. It powers code analysis on
-[Sourcegraph.com](https://sourcegraph.com) and additionally has been tested on the next typescript repositories:
+[Sourcegraph.com](https://sourcegraph.com) and additionally has been tested on the next typescript repositories:  
+
 **Successfully:**
 * [n3-charts/line-chart](https://github.com/n3-charts/line-chart) 
 * [palantir/plottable](https://github.com/palantir/plottable)
