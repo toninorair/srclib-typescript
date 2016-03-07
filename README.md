@@ -24,11 +24,12 @@ Now that this toolchain is installed, any program that relies on srclib will sup
 (TODO(sqs): add a tutorial link)
 ## Current limitations
 * Support only for projects which have **tsconfig.json** file in the root directory, no ther package systems are supported.
-* To be fully analysed file need to be included in the **Files** section of **tsconfig.json** file or to be referenced via reference path.
+* To be fully analysed file need to be included in the **Files** section of **tsconfig.json** file or to be referenced via reference path.  
+
 ## Tests and known issues
 srclib-typescript is alpha-quality software. It powers code analysis on
 [Sourcegraph.com](https://sourcegraph.com) and additionally has been tested on the next typescript repositories:
-Successfully:
+**Successfully:**
 * [n3-charts/line-chart](https://github.com/n3-charts/line-chart) 
 * [palantir/plottable](https://github.com/palantir/plottable)
 * [SierraSoftworks/Iridium](https://github.com/SierraSoftworks/Iridium)
@@ -47,10 +48,10 @@ Successfully:
 * [VSCodeVim/Vim](https://github.com/VSCodeVim/Vim)
 * [ngUpgraders/ng-forward](https://github.com/ngUpgraders/ng-forward)
 
-With issues:
+**With issues:**
 * [plasma-umass/doppio](https://github.com/plasma-umass/doppio) 
 * [vega/vega-lite](https://github.com/vega/vega-lite) - fails, one duplicate Ref  
-Next issues were found:
+**Next issues were found:**
 1. Unsupported builtins for interfaces
 2. Partially supported shorthand property assignments
 3. ExportSpecifiers can work better
