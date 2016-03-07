@@ -50,7 +50,8 @@ srclib-typescript is alpha-quality software. It powers code analysis on
 
 **With issues:**
 * [plasma-umass/doppio](https://github.com/plasma-umass/doppio) 
-* [vega/vega-lite](https://github.com/vega/vega-lite) - fails, one duplicate Ref  
+* [vega/vega-lite](https://github.com/vega/vega-lite) - fails, one duplicate Ref    
+
 **Next issues were found:**
 1. Unsupported builtins for interfaces
 2. Partially supported shorthand property assignments
