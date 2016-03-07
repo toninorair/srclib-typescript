@@ -53,10 +53,10 @@ srclib-typescript is alpha-quality software. It powers code analysis on
 * [vega/vega-lite](https://github.com/vega/vega-lite) - fails, one duplicate Ref    
 
 **Next issues were found:**
-1. Unsupported builtins for interfaces
-2. Partially supported shorthand property assignments
-3. ExportSpecifiers can work better
-4. Import clause not fully supported (syntax tree kind = 226)
+* Unsupported builtins for interfaces.
+* Partially supported shorthand property assignments.
+* ExportSpecifiers can work better.
+* Import clause not fully supported (syntax tree kind = 226).
 
 ## Run procedure
 Testing this toolchain requires that you have installed `src` from
