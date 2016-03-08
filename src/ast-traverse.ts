@@ -116,7 +116,7 @@ export class ASTTraverse {
                         //     console.error("MORE THAN ONE DECLARATION FOR ID", id.text, "WAS FOUND")
                         // }
                         //get all possible declarations and emit refs here
-                        for (const decl of symbol.declarations) {
+                        for (const decl of symbol.declarations.slice(0, 1)) {
                             if (decl.kind !== ts.SyntaxKind.SourceFile) {
                                 self._emitRef(decl, id);
                             }
@@ -130,9 +130,6 @@ export class ASTTraverse {
         }
 
         function _collectDefs(node: ts.Node) {
-            if (node.kind === ts.SyntaxKind.JSDocComment) {
-                console.error("Hello here with", node.getText());
-            }
             switch (node.kind) {
                 case ts.SyntaxKind.ModuleDeclaration: {
                     let decl = <ts.ModuleDeclaration>node;

@@ -23,7 +23,8 @@ You should see this srclib-typescript toolchain in the list.
 Now that this toolchain is installed, any program that relies on srclib will support TypeScript.
 (TODO(sqs): add a tutorial link)
 ## Current limitations
-* Support only for projects which have **tsconfig.json** file in the root directory, no ther package systems are supported.
+* Support only for projects which have **tsconfig.json** file in the root directory, other package systems are not supported.
+
 * To be fully analysed file need to be included in the **Files** section of **tsconfig.json** file or to be referenced via reference path.  
 
 ## Tests and known issues
