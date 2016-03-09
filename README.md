@@ -34,7 +34,7 @@ srclib-typescript is alpha-quality software. It powers code analysis on
 [Sourcegraph.com](https://sourcegraph.com) and additionally has been tested on the next typescript repositories:  
 
 **Successfully:**
-* [n3-charts/line-chart](https://github.com/n3-charts/line-chart) 
+* [n3-charts/line-chart](https://sourcegraph.com/github.com/sourcegraph/srclib-typescript) 
 * [palantir/plottable](https://github.com/palantir/plottable)
 * [SierraSoftworks/Iridium](https://github.com/SierraSoftworks/Iridium)
 * [valor-software/ng2-bootstrap](https://github.com/valor-software/ng2-bootstrap) 
