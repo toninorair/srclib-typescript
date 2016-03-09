@@ -1,4 +1,6 @@
 #!/bin/bash 
+# FOR TESTING PURPOSES ONLY, NOT RELATED TO DOCKER IMAGE BUILD
+# Can be used for projects without tsconfig.json file
 # This script generates tsconfig.json file, it looks for all files with extension .ts and adds them to the file section. 
 # Old tsconfig.json file, if exists is saved with .ol.timestamp extension
 
