@@ -27,6 +27,8 @@ Now that this toolchain is installed, any program that relies on srclib will sup
 
 * To be fully analysed file need to be included in the **Files** section of **tsconfig.json** file or to be referenced via reference path.  
 
+* Production of more than one ref for reference is currently switched off if multiple declarations are provided by AST tree. Reasons - src tool produces bugs in this case, for some references AST tree gives just the same declarations and it leads to duplicate ref error. Need to go back to this issue after a while.
+
 ## Tests and known issues
 srclib-typescript is alpha-quality software. It powers code analysis on
 [Sourcegraph.com](https://sourcegraph.com) and additionally has been tested on the next typescript repositories:  
@@ -49,16 +51,17 @@ srclib-typescript is alpha-quality software. It powers code analysis on
 * [rangle/batarangle](https://github.com/rangle/batarangle)
 * [VSCodeVim/Vim](https://github.com/VSCodeVim/Vim)
 * [ngUpgraders/ng-forward](https://github.com/ngUpgraders/ng-forward)
-
-**With issues:**
-* [plasma-umass/doppio](https://github.com/plasma-umass/doppio) 
 * [vega/vega-lite](https://github.com/vega/vega-lite) - fails, one duplicate Ref    
+
+**Testing in progress:**
+* [plasma-umass/doppio](https://github.com/plasma-umass/doppio) 
+* [DefinitelyTyped/DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped) 
 
 **Next issues were found:**
 * Unsupported builtins for interfaces.
 * Partially supported shorthand property assignments.
 * ExportSpecifiers can work better.
-* Import clause not fully supported (syntax tree kind = 226).
+* Import clause is not fully supported (syntax tree kind = 226, reproduced on [doppio](https://github.com/plasma-umass/doppio) project).
 
 ## Run procedure
 Testing this toolchain requires that you have installed `src` from
