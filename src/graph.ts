@@ -4,6 +4,9 @@ import fs = require('fs');
 import traverse = require('./ast-traverse');
 import unit = require('./unit');
 
+/**
+ * Graph command typescript routine
+ */
 export class GraphAction implements Action {
 
     private unitFile: string;

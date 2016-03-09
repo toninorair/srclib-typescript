@@ -1,3 +1,6 @@
+/**
+ * Program entry point
+ */
 /// <reference path="../typings/commander/commander.d.ts" />
 /// <reference path="action.ts" />
 /// <reference path="scan.ts" />

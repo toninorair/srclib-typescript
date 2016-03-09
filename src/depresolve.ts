@@ -5,6 +5,9 @@ import unit = require('./unit');
 var fs = require('fs');
 var readJson = require('read-package-json');
 
+/**
+ * Depresolve command typescript routine
+ */
 export class DepresolveAction implements Action {
 
     private unitFile: string;

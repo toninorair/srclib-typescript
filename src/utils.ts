@@ -1,6 +1,9 @@
 import * as path from "path";
 import * as ts from "typescript";
 
+/**
+ * Class saves info about full kind names used for Definitions
+ */
 export class DefKind {
     static CLASS: string = "class";
     static FUNC: string = "function";
@@ -22,6 +25,10 @@ export class DefKind {
     static SET_ACCESSOR = "set accessor";
 }
 
+/**
+ * Creates function string representation for path
+ * @param  {ts.Declaration} decl
+ */
 export function formFnSignatureForPath(decl: ts.Declaration): string {
     let resStr = decl.name.getText() + "__";
     let signDecl = <ts.SignatureDeclaration>decl;
@@ -35,6 +42,10 @@ export function formFnSignatureForPath(decl: ts.Declaration): string {
     return replaceSpecialSymbols(resStr);
 }
 
+/**
+ * Delete special symbols in fn signatures
+ * @param  {string} sig - function signature
+ */
 function replaceSpecialSymbols(sig: string): string {
     return sig.trim().replace(/;\s*/g, "").replace(/:\s*/g, "_").replace(/ \s*/g, "").
         replace(/=>\s*/g, "_").replace(/<\s*/g, "_").replace(/>\s*/g, "_").
@@ -46,6 +57,9 @@ export var PATH_SEPARATOR: string = ".";
 
 export var DATA_DOC_SEPARATOR: string = " ";
 
+/**
+ * Utils for path formatting
+ */
 export function formPath(scope: string, element, addToTheEnd: boolean = false): string {
     if (addToTheEnd) {
         return (scope === "") ? element : scope + PATH_SEPARATOR + element;

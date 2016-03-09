@@ -20,6 +20,9 @@ import child_process = require('child_process');
 
 var tsconfig = require('tsconfig');
 
+/**
+ * Scan command typescript routine, looks for tsconfig.json file
+ */
 export class ScanAction implements Action {
 
     execute(): void {

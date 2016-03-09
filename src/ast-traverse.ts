@@ -8,12 +8,35 @@ import defs = require('./def-and-ref-template');
 import utils = require('./utils');
 import resolver = require('./module-resolver');
 
+/**
+ * Class is used for AST tree traversing and defs and refs emission
+ */
 export class ASTTraverse {
-
+    /**
+      * Instance of class which holds Defs, Refs and Docs data
+      * @type {defs.RootObject}
+    */
     private allObjects: defs.RootObject;
+    /**
+      * Instance of program object, created for given list of files
+      * @type {ts.Program}
+    */
     private program: ts.Program;
+    /**
+      * AST type checker for given program
+      * @type {ts.TypeChecker}
+    */
     private checker: ts.TypeChecker;
+    /**
+      * List of all identifiers in declarations,
+      * prevents emissions of useless refs for declaration names
+      * @type {Array<ts.Identifier>}
+    */
     private allDeclIds: Array<ts.Identifier>;
+    /**
+      * Analyses and saves information about modules related to the given typescript files
+      * @type {resolver.ModuleResolver}
+    */
     private moduleResolver: resolver.ModuleResolver;
 
     constructor(fileNames: string[]) {
@@ -31,6 +54,12 @@ export class ASTTraverse {
         this.moduleResolver = new resolver.ModuleResolver();
     }
 
+    /**
+      * Traverses AST tree, emits defs and refs.
+      * Contains 3 passes - 1-st - saving info about modules
+      * 2-nd - emission of defs
+      * 3-rd - emissions of refs
+    */
     traverse() {
 
         for (const sourceFile of this.program.getSourceFiles()) {
@@ -70,6 +99,17 @@ export class ASTTraverse {
 
         process.stdout.write(JSON.stringify(this.allObjects));
 
+        /**
+          * Checks wheather given sourceFile is external or internal module
+          * External module criteria (one is enough):
+          * - contains at least one import declaration
+          * - contains at least one export assignment
+          * - contains at least one top level exported declaration of exac typescript
+          * For more detailed info please check http://www.typescriptlang.org/Content/TypeScript%20Language%20Specification.pdf
+          * @param  {ts.SourceFile}  sourceFile given typescript file
+          * @param  {ts.TypeChecker} checker    project checker
+          * @return {[type]}                    boolean value
+        */
         function _isExternalModule(sourceFile: ts.SourceFile, checker: ts.TypeChecker) {
             let res = ts.forEachChild(sourceFile, node => {
                 switch (node.kind) {
@@ -102,6 +142,14 @@ export class ASTTraverse {
             return res !== undefined;
         }
 
+        /**
+          * Saves all references, checks whether it is not declaration name
+          * Emits only first declaration, emission of more than one declaration was disabled because
+          * - src does not properly support it
+          * - sometimes AST produce duplicate same declarations for reference
+          * @param  {ts.Node} node - current node
+          * @return {[type]}  void
+        */
         function _collectRefs(node: ts.Node) {
             if (node.kind === ts.SyntaxKind.Identifier) {
                 let id = <ts.Identifier>node;
@@ -129,6 +177,11 @@ export class ASTTraverse {
             ts.forEachChild(node, _collectRefs);
         }
 
+        /**
+          * Collecting of defs happens here
+          * @param  {ts.Node} node - current node
+          * @return {[type]}       void
+        */
         function _collectDefs(node: ts.Node) {
             switch (node.kind) {
                 case ts.SyntaxKind.ModuleDeclaration: {
@@ -201,6 +254,12 @@ export class ASTTraverse {
         }
     }
 
+    /**
+       * Emission of definition and fake ref for it
+       * @param  {ts.Declaration} decl
+       * @param  {boolean     =    false}       blockedScope - identifies if we add numbers for blocks
+       * @return {[type]}              void
+       */
     private _emitDef(decl: ts.Declaration) {
         if (decl.name === undefined || decl.name.kind !== ts.SyntaxKind.Identifier) {
             console.error("Cannot emit declaration, declaration name is absent or is not identifier", decl.getText());
@@ -254,7 +313,14 @@ export class ASTTraverse {
         // console.error("-------------------");
     }
 
-    //now declaration is provided as node here
+    /**
+      * Emission of ref happens here
+      * @param  {ts.Declaration} decl
+      * @param  {ts.Identifier}  id
+      * @param  {boolean     =    false}       blockedScope  identifies if we add numbers for scopes
+      * @param  {boolean     =    false}       definitionRef identifies if it is ref for definition name
+      * @return {[type]}
+     */
     private _emitRef(decl: ts.Declaration, id: ts.Identifier, definitionRef: boolean = false) {
         //emitting ref here
         var ref: defs.Ref = new defs.Ref();
@@ -286,6 +352,7 @@ export class ASTTraverse {
         return (type.flags & ts.TypeFlags.Interface) != 0;
     }
 
+
     private _addDeclarationIdentifier(decl: ts.Declaration): void {
         if (decl.name !== undefined && decl.name.kind === ts.SyntaxKind.Identifier) {
             this.allDeclIds.push(<ts.Identifier>decl.name);
@@ -294,6 +361,9 @@ export class ASTTraverse {
         }
     }
 
+    /**
+     * Checks whether given identifier is declaration name identifier
+     */
     private _isDeclarationIdentifier(id: ts.Identifier): boolean {
         for (const declId of this.allDeclIds) {
             if (declId.getStart() === id.getStart()
@@ -305,6 +375,12 @@ export class ASTTraverse {
         return false;
     }
 
+    /**
+     * Gets kind for declaration - short or full, short for path, full - for definition info
+     * @param  {ts.SyntaxKind} kind
+     * @param  {boolean    =    false}       fullName
+     * @return {[type]}
+    */
     private _getDeclarationKindName(kind: ts.SyntaxKind, fullName: boolean = false) {
         switch (kind) {
             case ts.SyntaxKind.ModuleDeclaration:
@@ -357,6 +433,11 @@ export class ASTTraverse {
         }
     }
 
+    /**
+     * Gets declaration name for path
+     * @param  {ts.Declaration} decl
+     * @return {string}              declaration name
+    */
     private _getScopeNameForDeclaration(decl: ts.Declaration): string {
         switch (decl.kind) {
             case ts.SyntaxKind.MethodSignature:
@@ -379,6 +460,9 @@ export class ASTTraverse {
         }
     }
 
+    /**
+     * Gets declaration scope path
+    */
     private _getScopesChain(node: ts.Node, parentChain: string = ""): string {
         if (node.kind === ts.SyntaxKind.SourceFile) {
             let fileName: string = path.parse(node.getSourceFile().fileName).name;

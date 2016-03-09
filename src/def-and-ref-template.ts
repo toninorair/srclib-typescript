@@ -1,3 +1,6 @@
+/**
+ * Data template for Def object
+ */
 export class Data {
     Type: string;
     Keyword: string;
@@ -5,6 +8,9 @@ export class Data {
     Separator: string;
 }
 
+/**
+ * General Def template
+ */
 export class Def {
     Path: string;
     Name: string;
@@ -16,6 +22,9 @@ export class Def {
     TreePath: string;
 }
 
+/**
+ * General Ref template
+ */
 export class Ref {
     DefPath: string;
     Def: boolean;
@@ -24,12 +33,18 @@ export class Ref {
     End: number;
 }
 
+/**
+ * General Doc template for toolchain
+ */
 export class Doc {
     Path: string;
     Format: string;
     Data: string;
 }
 
+/**
+ * Container of all defs, refs, docs data
+ */
 export class RootObject {
     constructor() {
         this.Defs = new Array<Def>();
