@@ -185,7 +185,7 @@ export class ASTTraverse {
                 case ts.SyntaxKind.EnumMember:
                 case ts.SyntaxKind.PropertyDeclaration:
                 //FOR INTERFACES
-                //case ts.SyntaxKind.PropertySignature:
+                case ts.SyntaxKind.PropertySignature:
                 case ts.SyntaxKind.TypeAliasDeclaration:
                 case ts.SyntaxKind.MethodSignature:
                 case ts.SyntaxKind.ShorthandPropertyAssignment:
