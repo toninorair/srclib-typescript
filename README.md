@@ -51,7 +51,7 @@ srclib-typescript is alpha-quality software. It powers code analysis on
 * [rangle/batarangle](https://github.com/rangle/batarangle)
 * [VSCodeVim/Vim](https://github.com/VSCodeVim/Vim)
 * [ngUpgraders/ng-forward](https://github.com/ngUpgraders/ng-forward)
-* [vega/vega-lite](https://github.com/vega/vega-lite) - fails, one duplicate Ref    
+* [vega/vega-lite](https://github.com/vega/vega-lite)   
 
 **Testing in progress:**
 * [plasma-umass/doppio](https://github.com/plasma-umass/doppio) 
