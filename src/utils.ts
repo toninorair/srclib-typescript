@@ -6,7 +6,7 @@ export class DefKind {
     static FUNC: string = "function";
     static METHOD: string = "method";
     static VAR: string = "var";
-    static PARAM: string = "paramater";
+    static PARAM: string = "parameter";
     static FIELD: string = "property";
     static INTERFACE: string = "interface";
     static ENUM: string = "enum";

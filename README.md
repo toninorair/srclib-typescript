@@ -8,16 +8,16 @@ powered by srclib, including [Sourcegraph](https://sourcegraph.com).
 This toolchain is not a standalone program; it provides additional functionality
 to applications that use [srclib](https://srclib.org).
 First,
-[install the `src` program (see srclib installation instructions)](https://sourcegraph.com/sourcegraph/srclib).
+[install the `srclib` program (see srclib installation instructions)](https://sourcegraph.com/sourcegraph/srclib).
 Then run:
 ```
 git clone https://github.com/sourcegraph/srclib-typescript.git
 cd srclib-typescript
-src toolchain add sourcegraph.com/sourcegraph/srclib-typescript
+srclib toolchain install typescript
 ```
 To verify that installation succeeded, run:
 ```
-src toolchain list
+srclib toolchain list
 ```
 You should see this srclib-typescript toolchain in the list.
 Now that this toolchain is installed, any program that relies on srclib will support TypeScript.
@@ -64,20 +64,14 @@ srclib-typescript is alpha-quality software. It powers code analysis on
 * Import clause is not fully supported (syntax tree kind = 226, reproduced on [doppio](https://github.com/plasma-umass/doppio) project).
 
 ## Run procedure
-Testing this toolchain requires that you have installed `src` from
+Testing this toolchain requires that you have installed `srclib` from
 [srclib](https://sourcegraph.com/sourcegraph/srclib) and that you have this
 toolchain set up. See srclib documentation for more information.
 To test this toolchain's output against the expected output, run:
 ```
-# build the Docker container to run the tests in isolation
-src toolchain build sourcegraph.com/sourcegraph/srclib-typescript
 # run the tests
-src test
+srclib test
 ```
-By default, that command runs tests in an isolated Docker container. To run the
-tests on your local machine, run `src test -m program`. See the srclib
-documentation for more information about the differences between these two
-execution methods.
 ## Contributing
 Patches are welcomed via GitHub pull request! See
 [CONTRIBUTING.md](./CONTRIBUTING.md) for more information.
